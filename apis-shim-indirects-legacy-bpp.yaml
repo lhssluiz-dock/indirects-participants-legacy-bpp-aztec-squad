@@ -1,0 +1,4877 @@
+openapi: 3.0.1
+info:
+  title: Pix Indireto
+  description: API para participantes indiretos da BPP
+  version: v0.1.0
+paths:
+  '/pixindirectshim/addressing/key/{key}/claim':
+    post:
+      tags:
+        - Módulo de Endereçamento
+      summary: Reivindicar chave Pix
+      description: Cria reivindicação de propriedade de chave Pix com base na confirmação enviada pelo cliente
+      operationId: claimOwnership
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+        - name: key
+          in: path
+          description: Chave Pix
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/OwnershipClaimRequestTO'
+      responses:
+        '200':
+          description: Confirmação do pedido de reivindicação com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OwnershipClaimResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorTO'
+    delete:
+      tags:
+        - Módulo de Endereçamento
+      summary: Cancelar reivindicação de chave Pix
+      description: Cancele uma reivindicação de propriedade de chave Pix aberta pelo reivindicador
+      operationId: cancelClaimOwnership
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+        - name: key
+          in: path
+          description: Chave vinculada a reivindicação a qual será cancelada
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Cancelamento da solicitação de reivindicação feito com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OwnershipClaimResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorTO'
+  '/pixindirectshim/addressing/key/{key}/claimResponse':
+    post:
+      tags:
+        - Módulo de Endereçamento
+      summary: Confirmar/Negar reivindicação de propriedade de chave Pix
+      description: 'Confirme ou negue a propriedade da chave Pix fornecida, que está vinculada a uma reivindicação de propriedade'
+      operationId: confirmOwnership
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+        - name: key
+          in: path
+          description: Chave Pix
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OwnershipConfirmationRequestTO'
+      responses:
+        '200':
+          description: Confirmação ou cancelamento feito com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OwnershipClaimResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorTO'
+  '/pixindirectshim/addressing/key/{key}':
+    get:
+      tags:
+        - Módulo de Endereçamento
+      summary: Consultar chave Pix
+      description: 'Obtém as informações atuais sobre uma chave Pix. Se a chave de endereço for registrada localmente, as informações locais serão usadas'
+      operationId: findKey
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+        - name: key
+          in: path
+          description: Chave Pix
+          required: true
+          schema:
+            type: string
+        - name: userIdentification
+          in: query
+          description: 'Identificador do usuário pagador, CPF ou CNPJ do pagador formatado com 11 dígitos ou 14 dígitos.'
+          required: true
+          schema:
+            type: string
+        - name: schedulerDate
+          in: query
+          description: Data de agendamento usada para compôr o parâmetro endToEndId
+          schema:
+            type: string
+          example: '2022-05-26'
+      responses:
+        '200':
+          description: Informações da chave informada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindKeyResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorTO'
+    put:
+      tags:
+        - Módulo de Endereçamento
+      summary: Atualizar chave Pix
+      description: Atualiza chave Pix
+      operationId: updateKey
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+        - name: key
+          in: path
+          description: Chave Pix a ser atualizada
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateKeyRequestTO'
+      responses:
+        '200':
+          description: A solicitação para atualizar a chave foi bem-sucedida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateKeyResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorTO'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorTO'
+    delete:
+      tags:
+        - Módulo de Endereçamento
+      summary: Excluir chave Pix
+      description: 'Remove uma autoridade de uma chave de endereçamento. Se o titular da conta especificado no campo taxId for o proprietário atual da chave de endereçamento, a chave será desativada (localmente e no Banco Central).'
+      operationId: removeKey
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+        - name: key
+          in: path
+          description: Chave Pix a ser deletada
+          required: true
+          schema:
+            type: string
+        - name: taxId
+          in: query
+          required: true
+          schema:
+            type: string
+          example: O CPF ou CNPJ do titular da conta
+      responses:
+        '200':
+          description: Chave Pix excluída com sucesso do PSP
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoveKeyResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorTO'
+  /pixindirectshim/addressing/key:
+    post:
+      tags:
+        - Módulo de Endereçamento
+      summary: Registrar chave Pix
+      description: 'Registre uma chave de endereçamento. Se a chave de endereçamento precisa de confirmação de identificação, a identidade deve ser confirmada primeiro'
+      operationId: registerKey
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido.
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente.
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterKeyRequestTO'
+      responses:
+        '200':
+          description: 'Chave de endereçamento registrada localmente. Isso não significa que a chave esteja pronta para ser usada pelos pagadores. A chave pode precisar ser validada primeiro e, depois disso, precisa ser registrada no Banco Central.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterKeyResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorTO'
+  '/pixindirectshim/addressing/key/{key}/verify':
+    post:
+      tags:
+        - Módulo de Endereçamento
+      summary: Validar identidade de chave Pix
+      description: Confirma a propriedade de chave Pix
+      operationId: verifyOwnership
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+        - name: key
+          in: path
+          description: Chave Pix
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/OwnershipVerificationRequestTO'
+      responses:
+        '200':
+          description: A chave Pix então é registrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OwnershipVerificationResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorTO'
+  /pixindirectshim/addressing/keys:
+    get:
+      tags:
+        - Módulo de Endereçamento
+      summary: Consultar chaves Pix por agência e conta
+      description: Consulta as chaves de endereçamento local de uma conta no banco de dados local. Agência e conta devem ser fornecidas
+      operationId: findKeys
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+        - name: branch
+          in: query
+          description: Agência
+          required: true
+          schema:
+            type: string
+          example: '0001'
+        - name: accountNumber
+          in: query
+          description: Conta
+          required: true
+          schema:
+            type: string
+          example: '000094836'
+      responses:
+        '200':
+          description: Informações da chaves da agência e conta informada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindKeysResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorTO'
+  '/pixindirectshim/addressing/key/{key}/portability':
+    post:
+      tags:
+        - Módulo de Endereçamento
+      summary: Criar pedido de portabilidade de chave Pix
+      description: Cria reivindicação de portabilidade de chave Pix com base na confirmação enviada pelo cliente
+      operationId: claimPortability
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+        - name: key
+          in: path
+          description: Chave Pix
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/PortabilityClaimRequestTO'
+      responses:
+        '200':
+          description: Confirmação do pedido de reivindicação de portabilidade com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortabilityClaimResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorTO'
+    delete:
+      tags:
+        - Módulo de Endereçamento
+      summary: Cancelar pedido de portabilidade de chave Pix
+      description: Cancele uma reivindicação de portabilidade de chave Pix aberta pelo reivindicador
+      operationId: cancelClaimPortability
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+        - name: key
+          in: path
+          description: Chave Pix
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Cancelamento da solicitação de reivindicação de portabilidade com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortabilityClaimResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorTO'
+  '/pixindirectshim/addressing/key/{key}/portabilityResponse':
+    post:
+      tags:
+        - Módulo de Endereçamento
+      summary: Confirmar/Negar reivindicação de portabilidade de chave Pix
+      description: 'Confirme ou negue a reivindicação da chave Pix fornecida, que está vinculada a uma reivindicação de portabilidade'
+      operationId: confirmPortability
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+        - name: key
+          in: path
+          description: Chave Pix
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PortabilityConfirmationRequestTO'
+      responses:
+        '200':
+          description: Confirmação ou cancelamento feito com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortabilityClaimResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorTO'
+  '/pixindirectshim/claims/{claimId}':
+    get:
+      tags:
+        - Módulo de Endereçamento
+      summary: Consultar reivindicações de chave Pix
+      description: 'Obtém informações atuais sobre reivindicações ou portabilidade de chave Pix, claimId deve ser fornecido'
+      operationId: findClaim
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+        - name: claimId
+          in: path
+          required: true
+          schema:
+            type: string
+          examples:
+            '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}':
+              description: ID da reivindicação
+              value: f25ba892-95e0-11ea-bb37-0242ac130002
+      responses:
+        '200':
+          description: Informações da chave informada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorTO'
+  /pixindirectshim/claims:
+    get:
+      tags:
+        - Módulo de Endereçamento
+      summary: Consultar a listagem de reivindicações
+      description: 'Consultar a listagem de reivindicações em que o participante é doador ou reivindicador. Doador ou reivindicador, status e tipo devem ser fornecidos'
+      operationId: findClaims
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+        - name: stakeholder
+          in: query
+          description: Doador ou Reivindicador
+          required: true
+          schema:
+            type: string
+          example: 'DONOR, CLAIMER'
+        - name: status
+          in: query
+          description: Status
+          required: true
+          schema:
+            type: string
+          example: 'OPEN, WAITING_RESOLUTION, CONFIRMED, CANCELLED, COMPLETED'
+        - name: type
+          in: query
+          description: Tipo
+          required: true
+          schema:
+            type: string
+          example: 'OWNERSHIP, PORTABILITY'
+        - name: modifiedAfter
+          in: query
+          description: Filtra as reivindicações com data e hora maior ou igual ao valor informado.
+          schema:
+            type: string
+          example: 'AAAA-MM-DDTHH:MM:SS'
+        - name: modifiedBefore
+          in: query
+          description: Filtra as reivindicações com data e hora menor ou igual ao valor informado.
+          schema:
+            type: string
+          example: 'AAAA-MM-DDTHH:MM:SS'
+        - name: limit
+          in: query
+          description: Número de reivindicações a serem retornadas
+          schema:
+            type: integer
+            format: int32
+          example: 20
+      responses:
+        '200':
+          description: Informações da chaves da agência e conta informada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorTO'
+  /pixindirectshim/health/check:
+    get:
+      tags:
+        - Health Check
+      summary: Verificar integridade da aplicação
+      operationId: check
+      responses:
+        '200':
+          description: Aplicação Saudável
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: OK
+  '/pixindirectshim/dispute/v1/infraction-reports/{mipInfractionReportId}/closures':
+    post:
+      tags:
+        - Módulo de relatório de Infrações
+      summary: Relatório de fechamento de infrações
+      description: 'Encerramento do Relatório de infrações, inicialmente na base de dados do MIP e posteriormente no Banco Central. Isso só pode ser feito pelo PSP que recebeu o relatório'
+      operationId: closureReportsPixDisput
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: Idempotency-Id
+          in: header
+          description: 'Identificador de transação exclusivo usado para controle de idempotência. Quando um cliente repete uma requisição para um endpoint informando o mesmo Idempotency-Id, se a requisição anterior com aquele Idempotency-Id foi processada com sucesso, nenhuma nova transação é criada e a mesma resposta retornada anteriormente é retornada novamente'
+          required: true
+          schema:
+            type: string
+        - name: mipInfractionReportId
+          in: path
+          required: true
+          schema:
+            type: string
+          examples:
+            '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}':
+              description: identificador da solicitação no MIP
+              value: f25ba892-95e0-11ea-bb37-0242ac130002
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClosureReportsPixDisputeAnalisysTO'
+      responses:
+        '200':
+          description: Relatório retornado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InfractionReportsPixDisputeResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorBodyTO'
+  '/pixindirectshim/dispute/v1/infraction-reports/{mipInfractionReportId}':
+    get:
+      tags:
+        - Módulo de relatório de Infrações
+      summary: Relatório de consulta de infrações
+      description: Consulta um Relatório de Infração
+      operationId: consultInfractionReport
+      parameters:
+        - name: Authorization
+          in: header
+          description: A valid OAuth2 access token.
+          required: true
+          schema:
+            type: string
+        - name: mipInfractionReportId
+          in: path
+          required: true
+          schema:
+            type: string
+          examples:
+            '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}':
+              description: identificador da solicitação no MIP
+              value: f25ba892-95e0-11ea-bb37-0242ac130002
+      responses:
+        '200':
+          description: Relatório retornado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InfractionReportsPixDisputeResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorBodyTO'
+  /pixindirectshim/dispute/v1/infraction-reports:
+    post:
+      tags:
+        - Módulo de relatório de Infrações
+      summary: Relatório de abertura de infrações
+      description: 'Cria um relatório de Infração, que é enviado posteriormente ao Banco Central. Ambos os participantes debitados e creditados podem criar relatórios de infração'
+      operationId: openReportsPixDisput
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: Idempotency-Id
+          in: header
+          description: 'Identificador de transação exclusivo usado para controle de idempotência. Quando um cliente repete uma requisição para um endpoint informando o mesmo Idempotency-Id, se a requisição anterior com aquele Idempotency-Id foi processada com sucesso, nenhuma nova transação é criada e a mesma resposta retornada anteriormente é retornada novamente'
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InfractionCreationTO'
+      responses:
+        '200':
+          description: Relatório retornado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InfractionReportsPixDisputeResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorBodyTO'
+  '/pixindirectshim/dispute/v1/infraction-reports/{mipInfractionReportId}/cancellations':
+    post:
+      tags:
+        - Módulo de relatório de Infrações
+      summary: Relatório de cancelamento de infrações
+      operationId: reportCancellations
+      parameters:
+        - name: Authorization
+          in: header
+          description: A valid OAuth2 access token.
+          required: true
+          schema:
+            type: string
+        - name: Idempotency-Id
+          in: header
+          description: 'Identificador de transação exclusivo usado para controle de idempotência. Quando um cliente repete uma requisição para um endpoint informando o mesmo Idempotency-Id, se a requisição anterior com aquele Idempotency-Id foi processada com sucesso, nenhuma nova transação é criada e a mesma resposta retornada anteriormente é retornada novamente'
+          required: true
+          schema:
+            type: string
+        - name: mipInfractionReportId
+          in: path
+          description: identificador da solicitação no MIP
+          required: true
+          schema:
+            type: string
+          example: f25ba892-95e0-11ea-bb37-0242ac130002
+      responses:
+        '200':
+          description: Relatório retornado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InfractionReportsPixDisputeResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorBodyTO'
+  /pixindirectshim/v1/payment-service-providers:
+    get:
+      tags:
+        - Módulo de Liquidação
+      summary: Consulta de provedores de serviços de pagamento
+      description: 'Consulta os atuais provedores de serviços de pagamento válidos, conforme determinado pelo Banco Central<br><h2>Release note</h2><p>Novo parâmetro de busca adicionado: </p><ul><li>ispb</li></ul></p>'
+      operationId: findPaymentServiceProvider
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+        - name: participantName
+          in: query
+          description: Nome da instituição
+          schema:
+            type: string
+        - name: ispb
+          in: query
+          description: ISPB da instituição
+          schema:
+            type: string
+          example: 12345678
+      responses:
+        '200':
+          description: Consulta bem-sucedida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentServiceProviderResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorBodyTO'
+  /pixindirectshim/qrcode/decode:
+    post:
+      tags:
+        - Módulo de QRCode
+      summary: Decodificação de QRCode
+      description: Decodifica um QRCode estático ou dinâmico. O conteúdo decodificado do QRCode é sempre retornado considerando os padrões EMV e PIX
+      operationId: decodeQRCode
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QRCodeDecodingRequestTO'
+      responses:
+        '200':
+          description: QRCode decodificado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QRCodeDecodingResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorBodyTO'
+  /pixindirectshim/qrcode/static:
+    post:
+      tags:
+        - Módulo de QRCode
+      summary: Geração de QRCode estático
+      description: 'Gera um QRCode estático seguindo os padrões SPI. O conteúdo textual do QRCode é sempre retornado e, opcionalmente, o conteúdo binário da imagem QRCode também é retornado'
+      operationId: generateStaticQRCode
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QRCodeStaticRequestTO'
+      responses:
+        '200':
+          description: QRCode gerado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QRCodeStaticResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorBodyTO'
+  /pixindirectshim/v2/qrcode/dynamic:
+    post:
+      tags:
+        - Módulo de QRCode - Atualização Banco Central
+      summary: Geração de QRCode dinâmico. / v2 = Atualização Banco Central.
+      description: 'Gera um QRCode dinâmico seguindo os padrões SPI. O conteúdo textual do QRCode é sempre retornado e, opcionalmente, o conteúdo binário da imagem QRCode também é retornado'
+      operationId: generateDynamicV2QRCode
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+        - name: Receiver-Txid-Informed
+          in: header
+          description: O TxId pode ser informado pelo recebedor
+          schema:
+            type: string
+          example: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QRCodeDynamicV2RequestTO'
+      responses:
+        '200':
+          description: QRCode gerado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QRCodeDynamicV2ResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorBodyTO'
+  '/pixindirectshim/v2/qrcode/dynamic/{txId}':
+    put:
+      tags:
+        - Módulo de QRCode - Atualização Banco Central
+      summary: Revisão de QRCode / v2 = Atualização Banco Central
+      description: 'Revise e atualize um QRCode dinâmico seguindo os padrões SPI. O conteúdo textual do QRCode é sempre retornado e, opcionalmente, o conteúdo binário da imagem QRCode também é retornado'
+      operationId: reviseDynamicV2QRCode
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+        - name: Receiver-Txid-Informed
+          in: header
+          description: O TxId pode ser informado pelo recebedor.
+          schema:
+            type: string
+          example: true
+        - name: txId
+          in: path
+          description: Identificador único QRCode (reference ou txId). Gerado quando o QRCode foi emitido.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QRCodeDynamicReviseV2RequestTO'
+      responses:
+        '200':
+          description: QRCode revisado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QRCodeDynamicReviseV2ResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorBodyTO'
+  '/pixindirectshim/dispute/v1/refund-requests/{mipRefundRequestId}/cancellations':
+    post:
+      tags:
+        - Módulo especial de devoluções do PIX
+      summary: Cancelamento de pedido de devolução especial
+      operationId: cancellationRefundPixDisput
+      parameters:
+        - name: Authorization
+          in: header
+          description: A valid OAuth2 access token.
+          required: true
+          schema:
+            type: string
+        - name: 'Idempotency-Id '
+          in: header
+          description: 'Identificador de transação exclusivo usado para controle de idempotência. Quando um cliente repete uma requisição para um endpoint informando o mesmo Idempotency-Id, se a requisição anterior com aquele Idempotency-Id foi processada com sucesso, nenhuma nova transação é criada e a mesma resposta retornada anteriormente é retornada novamente'
+          required: true
+          schema:
+            type: string
+        - name: mipRefundRequestId
+          in: path
+          required: true
+          schema:
+            type: string
+          examples:
+            '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}':
+              description: identificador da solicitação no MIP
+              value: f25ba892-95e0-11ea-bb37-0242ac130002
+      responses:
+        '200':
+          description: Cancelamento de devolução especial feita com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefundPixDisputeResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorBodyTO'
+  '/pixindirectshim/dispute/v1/refund-requests/{mipRefundRequestId}/closure':
+    post:
+      tags:
+        - Módulo especial de devoluções do PIX
+      summary: Fechamento de uma devolução especial
+      operationId: closureRefundPixDisput
+      parameters:
+        - name: Authorization
+          in: header
+          description: A valid OAuth2 access token.
+          required: true
+          schema:
+            type: string
+        - name: 'Idempotency-Id '
+          in: header
+          description: 'Identificador de transação exclusivo usado para controle de idempotência. Quando um cliente repete uma requisição para um endpoint informando o mesmo Idempotency-Id, se a requisição anterior com aquele Idempotency-Id foi processada com sucesso, nenhuma nova transação é criada e a mesma resposta retornada anteriormente é retornada novamente'
+          required: true
+          schema:
+            type: string
+        - name: mipRefundRequestId
+          in: path
+          required: true
+          schema:
+            type: string
+          examples:
+            '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}':
+              description: identificador da solicitação no MIP
+              value: f25ba892-95e0-11ea-bb37-0242ac130002
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefundClosureTO'
+      responses:
+        '200':
+          description: Fechado de devolução especial feita com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefundPixDisputeResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorBodyTO'
+  '/pixindirectshim/dispute/v1/refund-requests/{mipRefundRequestId}':
+    get:
+      tags:
+        - Módulo especial de devoluções do PIX
+      summary: Consulta de pedido de devolução especial
+      description: Consulta uma solicitação de reembolso no DICT
+      operationId: consultRefundPixDisput
+      parameters:
+        - name: Authorization
+          in: header
+          description: A valid OAuth2 access token.
+          required: true
+          schema:
+            type: string
+        - name: 'Idempotency-Id '
+          in: header
+          description: 'Identificador de transação exclusivo usado para controle de idempotência. Quando um cliente repete uma requisição para um endpoint informando o mesmo Idempotency-Id, se a requisição anterior com aquele Idempotency-Id foi processada com sucesso, nenhuma nova transação é criada e a mesma resposta retornada anteriormente é retornada novamente'
+          required: true
+          schema:
+            type: string
+        - name: mipRefundRequestId
+          in: path
+          required: true
+          schema:
+            type: string
+          examples:
+            '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}':
+              description: identificador da solicitação no MIP
+              value: f25ba892-95e0-11ea-bb37-0242ac130002
+      responses:
+        '200':
+          description: Consulta de devolução especial retornada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefundPixDisputeResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorBodyTO'
+  /pixindirectshim/dispute/v1/refund-requests:
+    post:
+      tags:
+        - Módulo especial de devoluções do PIX
+      summary: Abertura de uma devolução especial
+      description: 'Cria uma Solicitação de Reembolso, que é enviada posteriormente ao Banco Central'
+      operationId: refundPixDispute
+      parameters:
+        - name: Authorization
+          in: header
+          description: A valid OAuth2 access token.
+          required: true
+          schema:
+            type: string
+        - name: 'Idempotency-Id '
+          in: header
+          description: 'Identificador de transação exclusivo usado para controle de idempotência. Quando um cliente repete uma requisição para um endpoint informando o mesmo Idempotency-Id, se a requisição anterior com aquele Idempotency-Id foi processada com sucesso, nenhuma nova transação é criada e a mesma resposta retornada anteriormente é retornada novamente'
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefundPixDisputeRequestTO'
+      responses:
+        '200':
+          description: Abertura de devolução especial feita com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefundPixDisputeResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorBodyTO'
+  /pixindirectshim/v1/settlements:
+    get:
+      tags:
+        - Módulo de Liquidação
+      summary: Consultar liquidações
+      description: 'Consulta as liquidações de pagamento instantâneo, Pagamentos enviados, PIXs recebidos e devoluções de PIX enviados ou recebidos. Na resposta, o atributo `eventType` indica o tipo de liquidação'
+      operationId: retrieveSettlement
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+        - name: pageSize
+          in: query
+          description: Tamanho da paginação
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: pageNumber
+          in: query
+          description: Número da página
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: eventType
+          in: query
+          description: 'Tipo da liquidação: ALL, PAYMENT, RECEIPT, RETURN_SENT, RETURN_RECEIVED'
+          required: true
+          schema:
+            type: string
+        - name: eventStatus
+          in: query
+          description: 'Status da liquidação: ALL, PAYMENT_INITIALIZED, WAITING_PAYMENT_CONFIRM, PAYMENT_REJECTED, WAITING_CREDIT_VALIDATION, SUCCESS, PAYMENT_REJECTED_BY_CLEARING, ERROR, UNCONFIRMED_OPERATION, PAYMENT_WAITING_APPROVAL, RECEIPT_RECEIVED, WAITING_RECEIPT_CONFIRM, RECEIPT_REJECTED, RECEIPT_REJECTION_CONFIRMED, RECEIPT_REJECTED_BY_CLEARING, PENDING_PROCESSING, RETURN_INITIATED, RETURN_REJECTED, WAITING_RETURN_CONFIRM, RETURN_REJECTED_BY_CLEARING, RETURN_WAITING_APPROVAL, RETURN_RECEIVED, RETURN_REJECTION_CONFIRMED, PENDING_CREDIT_ACCOUNT_HOLDER'
+          required: true
+          schema:
+            type: string
+          example: WAITING_PAYMENT_CONFIRM
+        - name: startTimestampUtc
+          in: query
+          description: Data após atual UTC.
+          schema:
+            type: string
+          example: '2022-09-10T12:34:44'
+        - name: endTimestampUtc
+          in: query
+          description: Data antes do atual UTC.
+          schema:
+            type: string
+          example: '2022-07-09T10:50:10'
+        - name: branch
+          in: query
+          description: Numero da agencia
+          schema:
+            type: string
+          example: '0001'
+        - name: accountNumber
+          in: query
+          description: Numero da conta
+          schema:
+            type: string
+          example: 102030
+        - name: eventId
+          in: query
+          description: Id do evento
+          schema:
+            type: string
+          example: 116820cb-554c-416f-bbb7-17dc4e044aca
+        - name: endToEndId
+          in: query
+          description: endToEndId do evento
+          schema:
+            type: string
+          examples:
+            '[E|D][0-9]{8}[0-9]{4}[0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][a-zA-Z0-9]{11}':
+              description: Identificação única de liquidação na compensação
+              value: E0057376820200217082881978247566
+      responses:
+        '200':
+          description: Informações das liquidações encontradas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveSettlementResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorTO'
+  '/pixindirectshim/v1/settlements/instant-payments/{instantPaymentId}/returns':
+    post:
+      tags:
+        - Módulo de Liquidação
+      summary: Devolve a liquidação recebida
+      description: 'Devolve a liquidação de pagamento instantâneo recebida e, em seguida, o retorno é enviado para a compensação'
+      operationId: returnInstantPayment
+      parameters:
+        - name: IdempotencyId
+          in: header
+          description: Identificador de transação exclusivo usado para controle de idempotência
+          required: true
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+        - name: instantPaymentId
+          in: path
+          description: Identificador do pagamento a ser devolvido
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstantPaymentReturnRequestTO'
+      responses:
+        '200':
+          description: Devolução aceita com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstantPaymentReturnResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorBodyTO'
+  /pixindirectshim/v1/settlements/instant-payments:
+    post:
+      tags:
+        - Módulo de Liquidação
+      summary: Cria uma nova liquidação de pagamento instantâneo.
+      description: 'Primeiro, a conta corrente do beneficiário especificada é debitada localmente (no sistema de contas) e, em seguida, o pagamento é enviado para a compensação'
+      operationId: settleInstantPayment
+      parameters:
+        - name: IdempotencyId
+          in: header
+          description: Identificador de transação exclusivo usado para controle de idempotência
+          required: true
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstantPaymentSettlementRequestTO'
+      responses:
+        '200':
+          description: Liquidação de pagamento instantânea aceita com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstantPaymentSettlementResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorBodyTO'
+      deprecated: true
+  /pixindirectshim/v2/settlements/instant-payments:
+    post:
+      tags:
+        - Módulo de Liquidação
+      summary: Cria uma nova liquidação de pagamento instantâneo
+      description: 'Primeiro, a conta corrente do beneficiário especificada é debitada localmente (no sistema de contas) e, em seguida, o pagamento é enviado para a compensação<br><center><b><h3>Preenchimento de campos de acordo com o <u>initiationForm</u></h3></b></center><table border=''1;solid;''> <tr align=''center''><th width=''12%''>initiationForm</th><th width=''12%''>addressingKey</th><th width=''10%''>receiverReconciliationIdentifier</th><th width=''10%''>initiatingInstitution</th><th>Descrição</th></tr>  <tr><td><center>INIC</center></td><td><center>Obrigatório</center></td><td><center>Obrigatório</center></td><td><center>Obrigatório</center></td><td>&nbsp;O pagamento iniciado através do serviço de iniciação de transação de pagamento (INIC), obriga os campos: <b>initiatingInstitution, addressingKey</b> e <b>receiverReconciliationIdentifier</b>.</td></tr> <tr><td><center>MANU</center></td><td><center>Não deve ser informado</center></td><td><center>Não deve ser informado</center></td><td><center>Opcional</center></td><td>&nbsp;O pagamento iniciado digitando dados manuais (MANU), não pode conter os seguintes campos: <b>addressingKey</b> e <b>receiverReconciliationIdentifier</b>.</td></tr> <tr><td><center>DICT</center></td><td><center>Obrigatório</center></td><td><center>Não deve ser informado</center></td><td><center>Opcional</center></td> <td>&nbsp;O pagamento iniciado através de uma chave de endereçamento (DICT), obriga o campo: <b>addressingKey</b> e não permite o campo <b>receiverReconciliationIdentifier</b>.</td></tr> <tr><td><center>QRES</center></td><td><center>Obrigatório</center></td><td><center>Opcional</center></td> <td><center>Opcional</center></td> <td>&nbsp;O pagamento iniciado através de um QRCode estático (QRES), obriga o campo: <b>addressingKey</b>.</td></tr> <tr><td><center>QRDN</center></td><td><center>Obrigatório</center></td><td><center>Obrigatório</center></td> <td><center>Opcional</center></td> <td>&nbsp;O pagamento iniciado através de um QRCode dinâmico (QRDN), obriga o campo: <b>addressingKey</b> e <b>receiverReconciliationIdentifier</b>.</td></tr> </table><br><center><b><h3>Preenchimento de campos de acordo com o <u>transactionPurpose</u></h3></b></center><table border=''1;solid;''> <tr align=''center''><th>transactionPurpose</th><th>transactionValue</th><th width=''12%''>cashValue</th><th>withdrawAgent.modality</th><th>withdrawAgent.serviceProvider</th><th>value</th><th>Descrição</th></tr> <tr><td><center>IPAY (Compras ou transações)</center></td><td><center>Não deve ser informado</center></td><td><center>Não deve ser informado</center></td><td><center>Não deve ser informado</center></td><td>&nbsp;Não deve ser informado</td><td>&nbsp;Valor da compra ou da transação.</td><td>&nbsp;Pix Comum.</td></tr> <tr><td><center>GSCB (Compra com Troco)</center></td><td><center>Obrigatório</center></td><td><center>Obrigatório</center></td><td><center>Obrigatório</center></td><td><center>Obrigatório</center></td><td>&nbsp;Soma dos campos <b>transactionValue</b> + <b>cashValue</b>.</td> <td>&nbsp;Conjunto de campos que devem ser informados para efetuar uma compra com troco (withdrawal).</td></tr> <tr><td><center>OTHR (Saque)</center></td><td><center>Não deve ser informado</center></td><td><center>Obrigatório</center></td><td><center>Obrigatório</center></td><td><center>Obrigatório</center></td><td>&nbsp;Preencha com o mesmo valor informado no campo <b>cashValue</b>.</td> <td>&nbsp;Conjunto de informações necessárias para fazer uma retirada.</td> </tr></table> <br><center><b><h3>Preenchimento de campos de acordo com o <u>instructionPriority</u></h3></b></center><table border=''1;solid;''> <tr align=''center''> <th>instructionPriority</th><th>instructionType</th><th>Descrição</th></tr> <tr><td><center>HIGH</center></td> <td><center>PAGPRI</center></td><td>&nbsp;Todo pagamento prioritário (HIGH) deve ter o tipo <b>PAGPRI</b>.</td></tr><tr><td><center>NORM</center></td><td><center>PAGFRD ou PAGAGD</center></td><td>&nbsp;<b>PAGFRD</b> - Transações com suspeita de fraude <br><b>&nbsp;PAGAGD</b> - Pagamentos programados</td></tr> </table><br>'
+      operationId: settleInstantPaymentV2
+      parameters:
+        - name: IdempotencyId
+          in: header
+          description: Identificador de transação exclusivo usado para controle de idempotência
+          required: true
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstantPaymentSettlementV2RequestTO'
+      responses:
+        '200':
+          description: Liquidação de pagamento instantânea aceita com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstantPaymentSettlementV2ResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorBodyTO'
+  /pixindirectshim/statements:
+    post:
+      tags:
+        - Módulo de Extrato
+      summary: Retorna o extrato simplificado
+      description: 'Retorna os dados do exrato da conta no payload, de acordo com o período solicitado <br><center><b><h3>Parâmetros de request</h3></b></center><table border=''1;solid;''> <tr align=''center''> <th>Nome</th><th>&nbsp;Parâmetro&nbsp;</th><th>Descrição</th> <tr><td><center>agency</center></td> <td><center>Obrigatório</center></td><td>&nbsp;Código da agência.</td></tr><tr><td><center>number</center></td> <td><center>Obrigatório</center></td><td>&nbsp;Número da Conta Corrente.</td></tr><tr><td><center>digit</center></td> <td><center>Obrigatório</center></td><td>&nbsp;Digito da Conta Corrente.</td></tr><tr><td><center>startDate</center></td> <td><center>Obrigatório</center></td><td>&nbsp;Data inicial para geração dos dados do extrato.</td></tr><tr><td><center>endDate</center></td> <td><center>Opcional</center></td><td>&nbsp;Data final para geração dos dados do extrato.</td></tr><tr><td><center>dateType</center></td><td><center>Opcional</center></td><td>&nbsp;<b>Default:</b> `ENTRADA` &nbsp;  <b>Enum</b>: `ENTRADA` `LANCAMENTO` `ENTRADA_LOTE`  </td></tr> <tr><td><center>searchDepositorDataByStatement</center></td><td><center>Opcional</center></td><td>&nbsp;<b>Default:</b> `false`, &nbsp;Se `true` irá buscar os dados do depositante de cada lançamento. </td></tr> </table><br>'
+      operationId: statements
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de acesso OAuth2 válido
+          required: true
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
+          description: Identificador de requisição. Se não informado será gerado automaticamente
+          schema:
+            type: string
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/AccountStatementsRequestTO'
+      responses:
+        '200':
+          description: Informações das liquidações encontradas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountStatementsResponseTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseErrorTO'
+components:
+  schemas:
+    OwnershipClaimResponseTO:
+      required:
+        - keyType
+      type: object
+      properties:
+        key:
+          maxLength: 77
+          type: string
+          description: Chave Pix
+          example: example.chave@matera.com
+        keyType:
+          type: string
+          description: Tipo de chave Pix
+          example: EMAIL
+          enum:
+            - CPF
+            - CNPJ
+            - EMAIL
+            - PHONE
+            - EVP
+        status:
+          type: string
+          description: O status da chave Pix
+          example: ACTIVE
+          enum:
+            - IDENTITY_VALIDATION_PENDING
+            - CLEARING_REGISTRATION_PENDING
+            - ACTIVE
+            - EXCLUDED
+            - PENDING_DELETION
+            - REJECTED
+            - EXPIRED
+            - PENDING_PORTABILITY_CONFIRMATION
+            - PENDING_CLAIM_CONFIRMATION
+            - DONATED_FOR_PORTABILITY
+            - PORTABILITY_REQUESTED
+            - USER_CONFIRMATION_PENDING_PORTABILITY
+            - PENDING_PORTABILITY_DICT
+            - AWAITING_RETURN_PSP_DONOR
+            - UNSUCCESSFUL_PORTABILITY
+            - CANCEL_PORTABILITY_REQUEST
+            - CONFIRM_CLAIMING_PORTABILITY
+            - SUCCESSFUL_PORTABILITY
+            - PENDING_CLAIM_DICT
+            - CLAIM_AWAITING_RETURN_PSP_DONOR
+            - PENDING_VALIDATION_COMPLETE_CLAIM
+            - SUCCESSFUL_CLAIM
+            - UNSUCCESSFUL_CLAIM
+            - CANCEL_CLAIM_REQUEST
+            - OWNERSHIP_REQUESTED
+            - USER_KEY_OWNERSHIP_VALIDATION_PENDING
+            - DONOR_PSP_KEY_CONFIRMED
+            - DONOR_PSP_KEY_UNCONFIRMED
+            - CLAIM_RESOLUTION_PERIOD_CLOSED
+            - DONATED_BY_CLAIM
+            - CANCEL_PSP_DONOR_OWNERSHIP_CLAIM_ORDER
+            - PENDING_UPDATE
+            - PENDING_COMPLETE_CLAIM_DICT
+            - CANCEL_DONOR_CLAIM_REQUEST
+        clearingDelayMilliseconds:
+          type: integer
+          description: 'Adiamento, em milisegundos, de quando será enviado a operação para o Banco Central. Esse campo apenas é enviado quando o próprio Banco Central estiver fora de serviço e os tipos de chaves não solicitarem um token.'
+          format: int64
+          example: 99999999999999
+    ElementErrorResponseTO:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+    ResponseErrorBodyTO:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ElementErrorResponseTO'
+    ResponseErrorHeaderTO:
+      type: object
+      properties:
+        X-Request-ID:
+          type: string
+          description: 'Cada solicitação de API possui um identificador de requisição associado. Se você precisar entrar em contato conosco sobre uma requisição específica, fornecer o identificador da requisição garantirá a resolução mais rápida possível.'
+    ResponseErrorTO:
+      type: object
+      properties:
+        header:
+          $ref: '#/components/schemas/ResponseErrorHeaderTO'
+        body:
+          $ref: '#/components/schemas/ResponseErrorBodyTO'
+    OwnershipClaimRequestTO:
+      required:
+        - claim
+      type: object
+      properties:
+        claim:
+          type: boolean
+          description: Sinalizador que indica a confirmação para criar uma reivindicação de portabilidade.
+    OwnershipConfirmationRequestTO:
+      required:
+        - ownershipConfirmed
+      type: object
+      properties:
+        ownershipConfirmed:
+          type: boolean
+          description: Sinalizador que indica se o dono de uma chave é confirmada.
+        token:
+          type: string
+          description: Token usado para confirmar o dono de uma chave. Deve ser fornecido quando 'ownershipConfirmed' for igual a 'true'.
+          example: Deve ser fornecido quando 'ownershipConfirmed' for igual a 'true'.
+        reason:
+          type: string
+          description: Motivo da operação de confirmação/rejeição
+          enum:
+            - USER_REQUESTED
+            - DEFAULT_OPERATION
+            - ACCOUNT_CLOSURE
+            - FRAUD
+    FindKeyResponseTO:
+      required:
+        - accountHolder
+        - keyLocallyActive
+        - keyType
+        - pspIdentification
+      type: object
+      properties:
+        key:
+          maxLength: 77
+          type: string
+          description: Chave Pix
+          example: example@matera.com
+        keyType:
+          type: string
+          description: Tipo de chave Pix
+          example: EMAIL
+          enum:
+            - CPF
+            - CNPJ
+            - EMAIL
+            - PHONE
+            - EVP
+        id:
+          pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+          type: string
+          description: ID da chave Pix
+        pspIdentification:
+          maximum: 99999999
+          type: string
+          description: Identificação do provedor de serviços de pagamento (ISPB)
+          example: '87459845'
+        accountHolder:
+          $ref: '#/components/schemas/KeyAccountHolderResponseTO'
+        status:
+          type: string
+          description: O status da chave Pix
+          enum:
+            - IDENTITY_VALIDATION_PENDING
+            - CLEARING_REGISTRATION_PENDING
+            - ACTIVE
+            - EXCLUDED
+            - PENDING_DELETION
+            - REJECTED
+            - EXPIRED
+            - PENDING_PORTABILITY_CONFIRMATION
+            - PENDING_CLAIM_CONFIRMATION
+            - DONATED_FOR_PORTABILITY
+            - PORTABILITY_REQUESTED
+            - USER_CONFIRMATION_PENDING_PORTABILITY
+            - PENDING_PORTABILITY_DICT
+            - AWAITING_RETURN_PSP_DONOR
+            - UNSUCCESSFUL_PORTABILITY
+            - CANCEL_PORTABILITY_REQUEST
+            - CONFIRM_CLAIMING_PORTABILITY
+            - SUCCESSFUL_PORTABILITY
+            - PENDING_CLAIM_DICT
+            - CLAIM_AWAITING_RETURN_PSP_DONOR
+            - PENDING_VALIDATION_COMPLETE_CLAIM
+            - SUCCESSFUL_CLAIM
+            - UNSUCCESSFUL_CLAIM
+            - CANCEL_CLAIM_REQUEST
+            - OWNERSHIP_REQUESTED
+            - USER_KEY_OWNERSHIP_VALIDATION_PENDING
+            - DONOR_PSP_KEY_CONFIRMED
+            - DONOR_PSP_KEY_UNCONFIRMED
+            - CLAIM_RESOLUTION_PERIOD_CLOSED
+            - DONATED_BY_CLAIM
+            - CANCEL_PSP_DONOR_OWNERSHIP_CLAIM_ORDER
+            - PENDING_UPDATE
+            - PENDING_COMPLETE_CLAIM_DICT
+            - CANCEL_DONOR_CLAIM_REQUEST
+        accountAdditionalInformation:
+          $ref: '#/components/schemas/KeyAccountResponseTO'
+        creationDate:
+          pattern: 'yyyy-MM-dd''T''HH:mm:ss.SSS'
+          type: string
+          description: Data de criação da chave Pix
+          example: '2022-05-26T22:22:18.072Z'
+        keyLocallyActive:
+          type: boolean
+          description: Chave Pix pertence a base de dados local
+          example: false
+    KeyAccountHolderResponseTO:
+      required:
+        - name
+        - taxId
+      type: object
+      properties:
+        name:
+          pattern: '^(?=[\u000A\u000D\u0020-\u007E\u0085\u00A0-\u00FF])[\p{L}\''''\- ]+$|^(?=[\u000A\u000D\u0020-\u007E\u0085\u00A0-\u00FF])[\p{L}\d\''\-\&\.\,\/\\ ]+$'
+          type: string
+          description: O nome do titular da conta
+          example: Financial Bank Ltda
+        taxId:
+          pattern: '(^\d{3}\.\d{3}\.\d{3}\-\d{2}$)|(^\d{2}\.\d{3}\.\d{3}\/\d{4}\-\d{2}$)|(^\d{11})|(^\d{14})'
+          type: string
+          description: O CPF / CNPJ do titular da conta
+          example: 979.115.312-17
+        taxIdMask:
+          type: string
+          description: O CPF / CNPJ do titular da conta com máscara
+          example: 16.***.***/****-24
+        tradeName:
+          pattern: '^(?=[\u000A\u000D\u0020-\u007E\u0085\u00A0-\u00FF])[\p{L}\d\''\-\&\.\,\/\\ ]+$'
+          type: string
+          description: O nome comercial do titular da conta
+          example: Financial Bank
+        ownerType:
+          type: string
+          description: O tipo do titular
+          example: LEGAL_PERSON
+      description: O titular da conta de uma chave de endereçamento
+    KeyAccountResponseTO:
+      required:
+        - accountNumber
+      type: object
+      properties:
+        branch:
+          pattern: '[0-9]{1,4}'
+          type: string
+          description: Agência
+          example: '0001'
+        accountNumber:
+          pattern: '[0-9xX]{1,20}'
+          type: string
+          description: 'Número da conta. Incluso o dígito verificador. Em caso do dígito ser uma letra, substituir com 0'
+          example: '0007654321'
+        accountType:
+          type: string
+          description: 'Classificação da categoria da conta, considerando os domínios fornecidos pelo Banco Central Possíveis valores: *CACC = conta corrente. *SLRY = conta salário. *SVGS = conta poupança. *TRAN = conta de pagamento (só deve ser usada na v2)'
+          enum:
+            - CACC
+            - SLRY
+            - SVGS
+            - TRAN
+        openingDate:
+          pattern: 'yyyy-MM-dd''T''HH:mm:ss'
+          type: string
+          description: Data de abertura da conta
+          example: '2022-05-26T21:33:15.721Z'
+      description: Dados da conta
+    KeyAntiFraudClearingInfoResponseTO:
+      required:
+        - counters
+      type: object
+      properties:
+        lastUpdated:
+          pattern: 'yyyy-MM-dd''T''HH:mm:ss.SSS'
+          type: string
+          description: Ultima atualização das informações antifraude
+          example: '2019-08-24T14:15:22Z'
+        counters:
+          type: array
+          description: Lista de contadores
+          items:
+            $ref: '#/components/schemas/KeyAntiFraudCounterResponseTO'
+      description: Informações antifraude fornecidas pelo Banco Central
+    KeyAntiFraudCounterResponseTO:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Tipo do contador antifraude
+          example: SETTLEMENTS
+          enum:
+            - SETTLEMENTS
+            - REPORTED_FRAUDS
+            - REPORTED_AML_CFT
+            - CONFIRMED_FRAUDS
+            - CONFIRMED_AML_CFT
+        by:
+          type: string
+          description: 'Agregador (chave, titular ou conta)'
+          example: KEY
+          enum:
+            - KEY
+            - OWNER
+            - ACCOUNT
+        d3:
+          type: string
+          description: Contador dos últimos três (3) dias
+          example: '0'
+        d30:
+          type: string
+          description: Contador dos últimos trinta (30) dias
+          example: '0'
+        m6:
+          type: string
+          description: 'Contador dos últimos seis (6) meses, sem o mês atual'
+          example: '0'
+      description: Lista de contadores
+    AccountHolderRequestTO:
+      required:
+        - name
+        - taxId
+      type: object
+      properties:
+        taxId:
+          type: string
+          description: CPF ou CNPJ da conta do proprietário. Pode conter apenas números ou traços e pontos.
+          example: '16837139000124'
+        name:
+          maxLength: 100
+          type: string
+          description: Nome do proprietário da conta.
+          example: Financeira
+        tradeName:
+          maxLength: 100
+          type: string
+          description: Nome comercial do proprietário da conta caso seja pessoa jurídica.
+          example: Financeira Ltda
+      description: Proprietário da conta da qual pertence a chave.
+    AccountRequestTO:
+      required:
+        - accountNumber
+        - accountType
+        - openingDate
+      type: object
+      properties:
+        branch:
+          maxLength: 4
+          minLength: 1
+          type: string
+          description: Número da agência da conta.
+          example: '0001'
+        accountNumber:
+          maxLength: 20
+          minLength: 1
+          type: string
+          description: Número da conta.
+          example: '0007654321'
+        accountType:
+          type: string
+          description: 'Tipo de conta. Possíveis valores: *CACC = conta corrente. *SLRY = conta salário. *SVGS = conta poupança. *TRAN = conta de pagamento (só deve ser usada na v2)'
+          enum:
+            - CACC
+            - SLRY
+            - SVGS
+            - TRAN
+        openingDate:
+          type: string
+          description: Data da abertura da conta.
+          format: 'AAAA-MM-DDTHH:MM:SS'
+          example: '2019-08-24T14:15:22Z'
+      description: Dados da conta.
+    RegisterKeyRequestTO:
+      required:
+        - account
+        - accountHolderInformation
+        - keyType
+      type: object
+      properties:
+        key:
+          maxLength: 77
+          type: string
+          description: Chave Pix.
+          example: example@matera.com
+        keyType:
+          type: string
+          description: Tipo de chave Pix.
+          example: EMAIL
+          enum:
+            - CPF
+            - CNPJ
+            - EMAIL
+            - PHONE
+            - EVP
+        account:
+          $ref: '#/components/schemas/AccountRequestTO'
+        accountHolderInformation:
+          $ref: '#/components/schemas/AccountHolderRequestTO'
+        startPortability:
+          type: boolean
+          description: Sinalizador indicativo para quando o usuário desejar iniciar o processo de portabilidade.
+          example: true
+          default: false
+    AccountResponseTO:
+      required:
+        - accountNumber
+        - accountType
+        - openingDate
+      type: object
+      properties:
+        branch:
+          maxLength: 4
+          minLength: 1
+          type: string
+          description: Número da agência da conta.
+          example: '0001'
+        accountNumber:
+          maxLength: 10
+          minLength: 1
+          type: string
+          description: Número da conta.
+          example: '0007654321'
+        accountType:
+          type: string
+          description: 'Tipo de conta. Possíveis valores: *CACC = conta corrente. *SLRY = conta salário. *SVGS = conta poupança. *TRAN = conta de pagamento (só deve ser usada na v2)'
+          enum:
+            - CACC
+            - SLRY
+            - SVGS
+            - TRAN
+        openingDate:
+          type: string
+          description: Data da abertura da conta.
+          example: '2022-05-26T14:22:55.459Z'
+      description: Identificação da conta.
+    OwnerResponseTO:
+      required:
+        - personType
+        - taxIdNumber
+      type: object
+      properties:
+        personType:
+          type: string
+          description: Tipo de pessoa
+          example: NATURAL_PERSON
+          enum:
+            - NATURAL_PERSON
+            - LEGAL_PERSON
+        taxIdNumber:
+          type: string
+          description: CPF ou CNPJ da conta do proprietário. Pode conter apenas números ou traços e pontos.
+          example: '16837139000124'
+        name:
+          type: string
+          description: Nome do proprietário da conta.
+          example: Foo bar
+        tradeName:
+          type: string
+          description: Nome comercial do proprietário da conta caso seja pessoa jurídica.
+          example: Financial Bank Ltda
+      description: Dados do novo proprietário.
+    RegisterKeyResponseTO:
+      required:
+        - keyType
+        - pspIdentification
+      type: object
+      properties:
+        key:
+          maxLength: 77
+          type: string
+          description: Chave Pix
+          example: example@matera.com
+        keyType:
+          type: string
+          description: Tipo de chave Pix
+          example: EMAIL
+          enum:
+            - CPF
+            - CNPJ
+            - EMAIL
+            - PHONE
+            - EVP
+        id:
+          pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+          type: string
+          description: ID da chave Pix
+          example: f25ba892-95e0-11ea-bb37-0242ac130002
+        pspIdentification:
+          maximum: 99999999
+          type: string
+          description: Identificação do provedor de serviços de pagamento (ISPB)
+          example: '87459845'
+        status:
+          type: string
+          description: O status da chave Pix
+          example: ACTIVE
+          enum:
+            - IDENTITY_VALIDATION_PENDING
+            - CLEARING_REGISTRATION_PENDING
+            - ACTIVE
+            - EXCLUDED
+            - PENDING_DELETION
+            - REJECTED
+            - EXPIRED
+            - PENDING_PORTABILITY_CONFIRMATION
+            - PENDING_CLAIM_CONFIRMATION
+            - DONATED_FOR_PORTABILITY
+            - PORTABILITY_REQUESTED
+            - USER_CONFIRMATION_PENDING_PORTABILITY
+            - PENDING_PORTABILITY_DICT
+            - AWAITING_RETURN_PSP_DONOR
+            - UNSUCCESSFUL_PORTABILITY
+            - CANCEL_PORTABILITY_REQUEST
+            - CONFIRM_CLAIMING_PORTABILITY
+            - SUCCESSFUL_PORTABILITY
+            - PENDING_CLAIM_DICT
+            - CLAIM_AWAITING_RETURN_PSP_DONOR
+            - PENDING_VALIDATION_COMPLETE_CLAIM
+            - SUCCESSFUL_CLAIM
+            - UNSUCCESSFUL_CLAIM
+            - CANCEL_CLAIM_REQUEST
+            - OWNERSHIP_REQUESTED
+            - USER_KEY_OWNERSHIP_VALIDATION_PENDING
+            - DONOR_PSP_KEY_CONFIRMED
+            - DONOR_PSP_KEY_UNCONFIRMED
+            - CLAIM_RESOLUTION_PERIOD_CLOSED
+            - DONATED_BY_CLAIM
+            - CANCEL_PSP_DONOR_OWNERSHIP_CLAIM_ORDER
+            - PENDING_UPDATE
+            - PENDING_COMPLETE_CLAIM_DICT
+            - CANCEL_DONOR_CLAIM_REQUEST
+        account:
+          $ref: '#/components/schemas/AccountResponseTO'
+        owner:
+          $ref: '#/components/schemas/OwnerResponseTO'
+        validationToken:
+          type: string
+          description: O token de validação que deve ser enviado para o serviço de validações para confirmar a autenticidade da chave. Após o retorno o usuário terá 24 horas para usar o token.
+          example: 95akE68T4
+        clearingDelayMilliseconds:
+          type: integer
+          description: 'Adiamento, em milisegundos, de quando será enviado a operação para o Banco Central. Esse campo apenas é enviado quando o próprio Banco Central estiver fora de serviço e os tipos de chaves não solicitarem um token.'
+          format: int64
+          example: 99999999999999
+    RemoveKeyResponseTO:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identificador de requisição.
+    UpdateKeyResponseTO:
+      required:
+        - keyType
+        - pspIdentification
+      type: object
+      properties:
+        key:
+          maxLength: 77
+          type: string
+          description: Chave Pix
+          example: matera@example.com
+        keyType:
+          type: string
+          description: Tipo de chave Pix
+          example: EMAIL
+          enum:
+            - CPF
+            - CNPJ
+            - EMAIL
+            - PHONE
+            - EVP
+        id:
+          pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+          type: string
+          description: ID da chave Pix
+        pspIdentification:
+          maximum: 99999999
+          type: string
+          description: Identificação do provedor de serviços de pagamento (ISPB)
+          example: '25021356'
+        status:
+          type: string
+          description: O status da chave Pix
+          enum:
+            - IDENTITY_VALIDATION_PENDING
+            - CLEARING_REGISTRATION_PENDING
+            - ACTIVE
+            - EXCLUDED
+            - PENDING_DELETION
+            - REJECTED
+            - EXPIRED
+            - PENDING_PORTABILITY_CONFIRMATION
+            - PENDING_CLAIM_CONFIRMATION
+            - DONATED_FOR_PORTABILITY
+            - PORTABILITY_REQUESTED
+            - USER_CONFIRMATION_PENDING_PORTABILITY
+            - PENDING_PORTABILITY_DICT
+            - AWAITING_RETURN_PSP_DONOR
+            - UNSUCCESSFUL_PORTABILITY
+            - CANCEL_PORTABILITY_REQUEST
+            - CONFIRM_CLAIMING_PORTABILITY
+            - SUCCESSFUL_PORTABILITY
+            - PENDING_CLAIM_DICT
+            - CLAIM_AWAITING_RETURN_PSP_DONOR
+            - PENDING_VALIDATION_COMPLETE_CLAIM
+            - SUCCESSFUL_CLAIM
+            - UNSUCCESSFUL_CLAIM
+            - CANCEL_CLAIM_REQUEST
+            - OWNERSHIP_REQUESTED
+            - USER_KEY_OWNERSHIP_VALIDATION_PENDING
+            - DONOR_PSP_KEY_CONFIRMED
+            - DONOR_PSP_KEY_UNCONFIRMED
+            - CLAIM_RESOLUTION_PERIOD_CLOSED
+            - DONATED_BY_CLAIM
+            - CANCEL_PSP_DONOR_OWNERSHIP_CLAIM_ORDER
+            - PENDING_UPDATE
+            - PENDING_COMPLETE_CLAIM_DICT
+            - CANCEL_DONOR_CLAIM_REQUEST
+        account:
+          $ref: '#/components/schemas/AccountResponseTO'
+        owner:
+          $ref: '#/components/schemas/OwnerResponseTO'
+        clearingDelayMilliseconds:
+          type: integer
+          description: 'Adiamento, em milisegundos, de quando será enviado a operação para o Banco Central. Esse campo apenas é enviado quando o próprio Banco Central estiver fora de serviço e os tipos de chaves não solicitarem um token.'
+          format: int64
+          example: 99999999999999
+    UpdateKeyRequestTO:
+      required:
+        - currentAccountNumber
+        - newAccountNumber
+        - newAccountOpeningDate
+        - newAccountType
+      type: object
+      properties:
+        currentBranch:
+          type: string
+          description: Agência atual.
+          example: '0001'
+        currentAccountNumber:
+          maxLength: 10
+          type: string
+          description: Número da conta atual.
+          example: '0007654321'
+        newBranch:
+          maxLength: 4
+          minLength: 1
+          type: string
+          description: Número da agência atualizada.
+          example: '0001'
+        newAccountNumber:
+          maxLength: 4
+          minLength: 1
+          type: string
+          description: Número da conta atualizada.
+          example: '0007654321'
+        newAccountType:
+          type: string
+          description: 'Tipo de conta atualizada. Possíveis valores: *CACC = conta corrente. *SLRY = conta salário. *SVGS = conta poupança. *TRAN = conta de pagamento (só deve ser usada na v2)'
+          enum:
+            - CACC
+            - SLRY
+            - SVGS
+            - TRAN
+        newAccountOpeningDate:
+          type: string
+          description: Data de abertuda da conta atualizada.
+          example: '2019-08-24T14:15:22Z'
+        newOwnerName:
+          pattern: '^(?=[\u000A\u000D\u0020-\u007E\u0085\u00A0-\u00FF])[\p{L}\- ]+$|^(?=[\u000A\u000D\u0020-\u007E\u0085\u00A0-\u00FF])[\p{L}\d\''\-\&\.\,\/\ ]+$'
+          type: string
+          description: Nome da conta atualizada.
+          example: Foo bar
+        newOwnerTradeName:
+          pattern: '^(?=[\u000A\u000D\u0020-\u007E\u0085\u00A0-\u00FF])[\p{L}\- ]+$|^(?=[\u000A\u000D\u0020-\u007E\u0085\u00A0-\u00FF])[\p{L}\d\''\-\&\.\,\/\ ]+$'
+          type: string
+          description: Nome comercial da conta atualizada caso seja to tipo pessoa jurídica.
+          example: Financial Bank Ltda
+    OwnershipVerificationResponseTO:
+      required:
+        - keyType
+      type: object
+      properties:
+        key:
+          maxLength: 77
+          type: string
+          description: Chave Pix
+          example: example@matera.com
+        keyType:
+          type: string
+          description: Tipo de chave Pix
+          example: EMAIL
+          enum:
+            - CPF
+            - CNPJ
+            - EMAIL
+            - PHONE
+            - EVP
+        id:
+          pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+          type: string
+          description: Identificador da chave de endereçamento.
+        psp:
+          type: string
+          description: Identificação do provedor de serviços de pagamento (ISPB).
+          example: '87459845'
+        status:
+          type: string
+          description: O status da chave Pix
+          enum:
+            - IDENTITY_VALIDATION_PENDING
+            - CLEARING_REGISTRATION_PENDING
+            - ACTIVE
+            - EXCLUDED
+            - PENDING_DELETION
+            - REJECTED
+            - EXPIRED
+            - PENDING_PORTABILITY_CONFIRMATION
+            - PENDING_CLAIM_CONFIRMATION
+            - DONATED_FOR_PORTABILITY
+            - PORTABILITY_REQUESTED
+            - USER_CONFIRMATION_PENDING_PORTABILITY
+            - PENDING_PORTABILITY_DICT
+            - AWAITING_RETURN_PSP_DONOR
+            - UNSUCCESSFUL_PORTABILITY
+            - CANCEL_PORTABILITY_REQUEST
+            - CONFIRM_CLAIMING_PORTABILITY
+            - SUCCESSFUL_PORTABILITY
+            - PENDING_CLAIM_DICT
+            - CLAIM_AWAITING_RETURN_PSP_DONOR
+            - PENDING_VALIDATION_COMPLETE_CLAIM
+            - SUCCESSFUL_CLAIM
+            - UNSUCCESSFUL_CLAIM
+            - CANCEL_CLAIM_REQUEST
+            - OWNERSHIP_REQUESTED
+            - USER_KEY_OWNERSHIP_VALIDATION_PENDING
+            - DONOR_PSP_KEY_CONFIRMED
+            - DONOR_PSP_KEY_UNCONFIRMED
+            - CLAIM_RESOLUTION_PERIOD_CLOSED
+            - DONATED_BY_CLAIM
+            - CANCEL_PSP_DONOR_OWNERSHIP_CLAIM_ORDER
+            - PENDING_UPDATE
+            - PENDING_COMPLETE_CLAIM_DICT
+            - CANCEL_DONOR_CLAIM_REQUEST
+        account:
+          $ref: '#/components/schemas/KeyAccountResponseTO'
+        clearingDelayMilliseconds:
+          type: integer
+          description: 'Adiamento, em milisegundos, de quando será enviado a operação para o Banco Central. Esse campo apenas é enviado quando o próprio Banco Central estiver fora de serviço e os tipos de chaves não solicitarem um token.'
+          format: int64
+          example: 99999999999999
+        owner:
+          $ref: '#/components/schemas/OwnerResponseTO'
+    OwnershipVerificationRequestTO:
+      required:
+        - validationToken
+      type: object
+      properties:
+        validationToken:
+          type: string
+          description: Token para confirmar o endereçamento da validação da identidade da chave.
+    FindKeysResponseTO:
+      type: object
+      properties:
+        keys:
+          type: array
+          items:
+            $ref: '#/components/schemas/FindKeyResponseTO'
+    PortabilityClaimResponseTO:
+      required:
+        - keyType
+      type: object
+      properties:
+        key:
+          maxLength: 77
+          type: string
+          description: Chave Pix
+          example: example@matera.com
+        keyType:
+          type: string
+          description: Tipo de chave Pix
+          example: EMAIL
+          enum:
+            - CPF
+            - CNPJ
+            - EMAIL
+            - PHONE
+            - EVP
+        status:
+          type: string
+          description: O status da chave Pix
+          example: IDENTITY_VALIDATION_PENDING
+          enum:
+            - IDENTITY_VALIDATION_PENDING
+            - CLEARING_REGISTRATION_PENDING
+            - ACTIVE
+            - EXCLUDED
+            - PENDING_DELETION
+            - REJECTED
+            - EXPIRED
+            - PENDING_PORTABILITY_CONFIRMATION
+            - PENDING_CLAIM_CONFIRMATION
+            - DONATED_FOR_PORTABILITY
+            - PORTABILITY_REQUESTED
+            - USER_CONFIRMATION_PENDING_PORTABILITY
+            - PENDING_PORTABILITY_DICT
+            - AWAITING_RETURN_PSP_DONOR
+            - UNSUCCESSFUL_PORTABILITY
+            - CANCEL_PORTABILITY_REQUEST
+            - CONFIRM_CLAIMING_PORTABILITY
+            - SUCCESSFUL_PORTABILITY
+            - PENDING_CLAIM_DICT
+            - CLAIM_AWAITING_RETURN_PSP_DONOR
+            - PENDING_VALIDATION_COMPLETE_CLAIM
+            - SUCCESSFUL_CLAIM
+            - UNSUCCESSFUL_CLAIM
+            - CANCEL_CLAIM_REQUEST
+            - OWNERSHIP_REQUESTED
+            - USER_KEY_OWNERSHIP_VALIDATION_PENDING
+            - DONOR_PSP_KEY_CONFIRMED
+            - DONOR_PSP_KEY_UNCONFIRMED
+            - CLAIM_RESOLUTION_PERIOD_CLOSED
+            - DONATED_BY_CLAIM
+            - CANCEL_PSP_DONOR_OWNERSHIP_CLAIM_ORDER
+            - PENDING_UPDATE
+            - PENDING_COMPLETE_CLAIM_DICT
+            - CANCEL_DONOR_CLAIM_REQUEST
+        clearingDelayMilliseconds:
+          type: integer
+          description: 'Adiamento, em milisegundos, de quando será enviado a operação para o Banco Central. Esse campo apenas é enviado quando o próprio Banco Central estiver fora de serviço e os tipos de chaves não solicitarem um token.'
+          format: int64
+          example: 99999999999999
+    PortabilityClaimRequestTO:
+      type: object
+      properties:
+        claim:
+          type: boolean
+          description: Sinalizador que indica a confirmação para criar um pedido de portabilidade.
+    PortabilityConfirmationRequestTO:
+      type: object
+      properties:
+        portabilityConfirmed:
+          type: boolean
+          description: Sinalizador que indica se a portabilidade de uma chave é confirmada.
+          example: true
+        token:
+          type: string
+          description: Token usado para confirmar a portabilidade de uma chave. Deve ser fornecido quando 'isPortabilityConfirmed' for igual a 'true'.
+          example: 95akE68T4
+        reason:
+          type: string
+          description: Motivo da operação de confirmação/rejeição
+          example: USER_REQUESTED
+          enum:
+            - USER_REQUESTED
+            - DEFAULT_OPERATION
+            - ACCOUNT_CLOSURE
+            - FRAUD
+    ClaimDataResponseTO:
+      type: object
+      properties:
+        hasMoreElements:
+          type: boolean
+          description: Indica se existem mais itens a serem exibidos.
+          example: true
+        responseTime:
+          type: string
+          description: Data e hora da resposta.
+          example: 'AAAA-MM-DDTHH:MM:SSZ'
+        correlationId:
+          pattern: '^[0-9a-fA-F]{32}$'
+          type: string
+          description: Identificador de correlação para suporte operacional.
+        claims:
+          type: array
+          description: Listagem das reivindicações.
+          items:
+            $ref: '#/components/schemas/ClaimsResponseTO'
+      description: Dados da lista de reivindicações.
+    ClaimResponseTO:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ClaimDataResponseTO'
+    ClaimerAccountResponseTO:
+      type: object
+      properties:
+        participant:
+          type: string
+          description: Identificador SPB do provedor de conta
+          example: '12345678'
+        branch:
+          type: string
+          description: 'Agência, sem dígito verificador.'
+          example: '0001'
+        accountNumber:
+          type: string
+          description: 'Número da conta, incluindo dígito verificador. Se o dígito verificador for uma letra, deverá ser substituído por 0'
+          example: '0007654321'
+        accountType:
+          type: string
+          description: 'Tipo da conta, considerando os domínios fornecidos pelo Bacen.'
+          example: CACC
+          enum:
+            - CACC
+            - SLRY
+            - SVGS
+            - TRAN
+        openingDate:
+          type: string
+          description: Data e hora de abertura de conta.
+          example: '2019-08-24T14:15:22Z'
+      description: Dados da conta local.
+    ClaimerResponseTO:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Tipo de pessoa
+          example: NATURAL_PERSON
+          enum:
+            - NATURAL_PERSON
+            - LEGAL_PERSON
+        taxIdNumberMask:
+          type: string
+          description: Documento (CPF/CNPJ) mascarado do titular da conta.
+          example: 16.***.***/****-24
+        name:
+          type: string
+          description: Nome do titular da conta.
+          example: Banco Financeiro Ltda
+        tradeName:
+          type: string
+          description: Nome comercial.
+          example: Banco Financeiro
+      description: Dados do titular da conta de uma chave de endereçamento.
+    ClaimsResponseTO:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Tipo de Reivindicação
+          example: OWNERSHIP
+          enum:
+            - OWNERSHIP
+            - PORTABILITY
+        key:
+          maxLength: 77
+          type: string
+          description: Chave de endereçamento
+          example: example@matera.com
+        keyType:
+          type: string
+          description: Tipo da chave de endereçamento
+          example: EMAIL
+          enum:
+            - CPF
+            - CNPJ
+            - EMAIL
+            - PHONE
+            - EVP
+        claimerAccount:
+          $ref: '#/components/schemas/ClaimerAccountResponseTO'
+        claimer:
+          $ref: '#/components/schemas/ClaimerResponseTO'
+        donorParticipant:
+          type: string
+          description: Identificação do provedor de serviços de pagamento (ISPB).
+          example: '87459845'
+        id:
+          type: string
+          description: Identificador da chave de endereçamento
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        status:
+          type: string
+          description: Status da reivindicação.
+          example: OPEN
+          enum:
+            - OPEN
+            - WAITING_RESOLUTION
+            - CONFIRMED
+            - CANCELLED
+            - COMPLETED
+        resolutionPeriodEnd:
+          type: string
+          description: Data e hora em que o período de resolução termina.
+          example: '2019-08-24T14:15:22Z'
+        completionPeriodEnd:
+          type: string
+          description: Data e hora em que termina o período de fechamento. Apenas para reclamação de posse.
+          example: '2019-08-24T14:15:22Z'
+        lastModified:
+          type: string
+          description: Data e hora da última modificação do status do pedido.
+          example: '2019-08-24T14:15:22Z'
+        confirmReason:
+          type: string
+          description: Motivo da confirmação da operação.
+          example: FRAUD
+          enum:
+            - USER_REQUESTED
+            - DEFAULT_OPERATION
+            - ACCOUNT_CLOSURE
+            - FRAUD
+        cancelReason:
+          type: string
+          description: Motivo do cancelamento da operação.
+          example: USER_REQUESTED
+          enum:
+            - USER_REQUESTED
+            - DEFAULT_OPERATION
+            - ACCOUNT_CLOSURE
+            - FRAUD
+        cancelledBy:
+          type: string
+          description: Participante que realizou o cancelamento (se cancelado)
+          example: DONOR
+          enum:
+            - DONOR
+            - CLAIMER
+      description: Listagem das reivindicações.
+    AnalysisTO:
+      required:
+        - analysisResult
+      type: object
+      properties:
+        analysisResult:
+          type: string
+          description: 'Resultado da solicitacão: | AGREED | DISAGREED'
+          example: AGRRED
+        analysisDetails:
+          type: string
+          description: detalhes da analise da infracão
+          example: 'Fraude não detectada, recebedor idôneo.'
+      description: Análise sobre relátorio de infração.
+    ClosureReportsPixDisputeAnalisysTO:
+      type: object
+      properties:
+        analysis:
+          $ref: '#/components/schemas/AnalysisTO'
+    CustomerFundsMonitoringTO:
+      type: object
+      properties:
+        active:
+          type: boolean
+          example: true
+        valueMonitored:
+          type: number
+          format: double
+          example: 150.75
+      description: Status de monitoramento de fundos do cliente.
+    CustomerTO:
+      type: object
+      properties:
+        branch:
+          maxLength: 4
+          type: string
+          description: Agência da conta do cliente da transação relativa ao relatório de infração.
+          example: '0001'
+        account:
+          maxLength: 20
+          type: string
+          description: Número da conta do cliente da transação relacionada à relatório de infração.
+          example: '86548'
+        taxId:
+          maxLength: 14
+          type: string
+          description: CPF / CNPJ do cliente da operação referente a relatório de infração.
+          example: '04435745788'
+        ispb:
+          maxLength: 8
+          type: string
+          description: ISPB de PSP.
+          example: '12345678'
+    InfractionReportPixDisputeData:
+      required:
+        - mipInfractionReportId
+      type: object
+      properties:
+        infractionType:
+          type: string
+          description: Tipo de relatório de infração.
+          example: FRAUD
+          enum:
+            - FRAUD
+            - REFUND_REQUEST
+            - REFUND_CANCELLED
+        reportDetails:
+          maxLength: 2000
+          type: string
+          description: Detalhes para ajudar o PSP do destinatário a analisar o relatório de infração.
+          example: Problema na geração de QRCode
+        analysis:
+          $ref: '#/components/schemas/AnalysisTO'
+        mipInfractionReportId:
+          type: string
+          description: Identificador do relatório de infração MIP.
+          example: f25ba892-95e0-11ea-bb37-0242ac130002
+        dictInfractionReportId:
+          type: string
+          description: Identificador do relatório de infração do Banco Central para relatórios criados pelo PSP local.
+          example: f25ba892-95e0-11ea-bb37-0242ac13000
+        status:
+          type: string
+          description: Status do relatório de infração no MIP.
+          example: WAITING_OPENING
+          enum:
+            - CREATED
+            - WAITING_OPENING
+            - OPEN
+            - ERROR
+            - RECEIVED
+            - WAITING_ACKNOWLEDGMENT
+            - CLOSED
+            - WAITING_CLOSING
+            - WAITING_CANCELLING
+            - CANCELLED
+            - RETRIEVING_TRANSACTION_DETAIL
+            - PENDING_FINANCIAL_HOLDS
+            - CLOSED_WITHOUT_RETURN
+        creationTimeUtc:
+          type: string
+          description: Data/hora de criação do relatório de infração.
+          example: '2019-08-24T14:15:22Z'
+        transaction:
+          $ref: '#/components/schemas/TransactionTO'
+        reportedBy:
+          type: string
+          description: Participante que deu origem à denúncia de violação.
+          example: DEBITED_PARTICIPANT
+        refund:
+          $ref: '#/components/schemas/RefundTO'
+      description: Dados do retorno de relatório de infrações
+    InfractionReportsPixDisputeResponseTO:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/InfractionReportPixDisputeData'
+    RefundTO:
+      type: object
+      properties:
+        expectedAmount:
+          type: number
+          description: Valor esperado que deve ser bloqueado ou monitorado no saldo do cliente.
+          format: double
+          example: 10.54
+        customerFundsMonitoring:
+          $ref: '#/components/schemas/CustomerFundsMonitoringTO'
+        mipRefundRequestId:
+          type: string
+          description: O ID de solicitação de reembolso MIP associado a este relatório de notificação.
+          example: af206260-2f3e-4f1b-91b5-b94c5e6635f9
+        dictRefundRequestId:
+          type: string
+          description: Identificador de solicitação de reembolso do Banco Central associado a este relatório de notificação.
+          example: 60f6070c-3d0d-484b-abeb-1d9f7f2b03cd
+      description: Dados de reembolso relativos a um relatório de infração.
+    TransactionTO:
+      type: object
+      properties:
+        transactionId:
+          maxLength: 46
+          type: string
+          description: Identificação da transação a que o relatório de infração se refere.
+          example: E9999901012341234123412345678900
+        debitedParticipant:
+          type: string
+          description: Identificador SPB do participante do pagador da transação.
+          example: '99999010'
+        creditedParticipant:
+          type: string
+          description: Identificador SPB do participante do receptor da transação.
+          example: '99999011'
+        customer:
+          $ref: '#/components/schemas/CustomerTO'
+      description: Atributos de transação de um relatório de infração.
+    InfractionCreationTO:
+      required:
+        - infractionType
+        - reportDetails
+        - transactionId
+      type: object
+      properties:
+        infractionType:
+          type: string
+          description: Tipo de Relatório de Infração.
+          example: REFUND_REQUEST
+          enum:
+            - FRAUD
+            - REFUND_REQUEST
+            - REFUND_CANCELLED
+        reportDetails:
+          maxLength: 2000
+          type: string
+          description: Detalhes para ajudar o PSP do destinatário a analisar o relatório de infração.
+        transactionId:
+          type: string
+          description: 'id da solicitacao, sendo esse o valor do endToEndId de um PIX'
+          example: E9999901012341234123412345678900
+        openRefundRequestAutomatically:
+          type: boolean
+          description: 'abertura automática de devolucão?: | true (para sim) | false (para não)'
+          example: true
+    ParticipantResponseTO:
+      required:
+        - identification
+        - name
+      type: object
+      properties:
+        identification:
+          type: string
+          description: Identificação do provedor de serviços de pagamento (ISPB)
+          example: '12345678'
+        name:
+          type: string
+          description: Nome do provedor de serviços de pagamento
+          example: Dock
+        fullName:
+          type: string
+          description: Nome completo do provedor de serviços de pagamento
+        type:
+          type: string
+          description: 'Indica a natureza do participante, podendo ser DIRECT ou INDIRECT'
+          enum:
+            - DIRECT
+            - INDIRECT
+        pixParticipationMode:
+          type: string
+          description: 'Tipo de participação nas operações de PIX. LESP = Liquidador especial, não pode enviar ou receber pix. GOVE = Entidade governamental. PDCT = Provedor de contas transacionais.'
+          enum:
+            - LESP
+            - GOVE
+            - PDCT
+      description: 'Um provedor de serviços de pagamento, que pode ser direto ou indireto'
+    PaymentServiceProviderDataResponseTO:
+      type: object
+      properties:
+        participants:
+          type: array
+          description: 'Um provedor de serviços de pagamento, que pode ser direto ou indireto'
+          items:
+            $ref: '#/components/schemas/ParticipantResponseTO'
+    PaymentServiceProviderResponseTO:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PaymentServiceProviderDataResponseTO'
+    QRCodeDecodingRequestTO:
+      required:
+        - spiQRCode
+      type: object
+      properties:
+        spiQRCode:
+          maxLength: 1000
+          type: string
+          description: Representação em texto do QRCode.
+          example: 00020101021126440014BR.GOV.BCB.PIX0122PSPKEY5204000053039865802BR5913PSPNAME6008BRASILIA6304DFE3
+        dateForPayment:
+          type: string
+          description: Data de pagamento pretendida.
+          example: 2022/08/30
+        municipalityCode:
+          type: string
+          description: Código baseado na tabela de códigos de municípios do IBGE.
+          example: '35'
+    BRCodeArrangementResponseTO:
+      type: object
+      properties:
+        emvId:
+          maximum: 51
+          minimum: 26
+          type: string
+          description: O emv id
+          example: coloque aqui o emv id
+        gui:
+          type: string
+          description: O identificador único global
+          example: br.gov.bcb.pix
+      description: Os arranjos encontrados nos EMVs 26 a 51
+    QRCodeDecodedDataResponseTO:
+      required:
+        - country
+        - currency
+        - merchantCity
+        - merchantName
+        - payload
+        - payloadUrl
+        - pointOfInitiationMethod
+      type: object
+      properties:
+        pointOfInitiationMethod:
+          maximum: 12
+          minimum: 11
+          type: string
+          description: Indica se o QRCode é reutilizável (11) ou não (12)
+          example: '12'
+        country:
+          type: string
+          description: Código do país conforme ISO3166-1 alpha 2. BR corresponde ao Brasil
+          example: BR
+        currency:
+          type: string
+          description: Moeda do valor conforme ISO4217. "986" corresponde a reais
+          example: '986'
+        value:
+          type: string
+          description: Valor do pagamento
+          example: '986'
+        merchantName:
+          maxLength: 25
+          type: string
+          description: Nome do beneficiário
+          example: PSP Name
+        merchantCity:
+          maxLength: 15
+          type: string
+          description: Cidade do beneficiário
+          example: CAMPINAS
+        reference:
+          maxLength: 25
+          type: string
+          description: Identificador de recebíveis usado pelo recebedor para identificar o pagamento/cobrança
+          example: QRS1TXJSDU3DSSFDGFG44F2565
+        addressingKey:
+          type: string
+          description: Chave Pix
+          example: fc5ebf2d-db0f-03c9-cab5-7d3b8f455b3c
+        additionalInformation:
+          maxLength: 72
+          type: string
+          description: Informações adicionais sobre o pagamento
+          example: Informações adicionais sobre o pagamento
+        payloadId:
+          maxLength: 36
+          type: string
+          description: Um identificador exclusivo que identifica a carga recuperada do PSP externo
+          example: c5ebad40-3110-4614-af37-2c4fcd5710a9
+        payload:
+          type: string
+          description: Detalhes do Payload do QRCode
+          example: Detalhes do Payload do QRCode
+        payloadUrl:
+          type: string
+          description: A URL de informações públicas do QRCode
+          example: pix.matera.com/qrs1/01awRyTl1jVtANCMovEKlvxAMVJygn4W4TT2JTKcMkGIDe7HCxrKCr456
+        withdrawServiceProvider:
+          type: string
+          description: Indica o provedor de serviços de pagamento que está sendo realizada a retirada. Pode ser direto ou indireto
+          example: '12345678'
+    QRCodeDecodingResponseTO:
+      required:
+        - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: Tipo de QRCode
+          example: STATIC
+          enum:
+            - STATIC
+            - DYNAMIC
+        arrangements:
+          type: array
+          description: Os arranjos encontrados nos EMVs 26 a 51
+          items:
+            $ref: '#/components/schemas/BRCodeArrangementResponseTO'
+        decodedData:
+          $ref: '#/components/schemas/QRCodeDecodedDataResponseTO'
+    AddressingKeyRequestTO:
+      required:
+        - key
+        - type
+      type: object
+      properties:
+        key:
+          maxLength: 77
+          type: string
+          description: Chave Pix
+          example: 5514981490431
+        type:
+          type: string
+          description: Tipo de chave Pix
+          example: PHONE
+          enum:
+            - PHONE
+            - EMAIL
+            - CPF
+            - CNPJ
+            - EVP
+      description: Chave do pix
+    ImageGenerationRequestTO:
+      required:
+        - errorCorrectionLevel
+      type: object
+      properties:
+        errorCorrectionLevel:
+          type: string
+          description: 'Nível de correção de erros, de acordo com os padrões do QRCode'
+          example: M
+          enum:
+            - 'L, M, Q, H'
+          default: M
+        imageWidth:
+          minimum: 400
+          type: string
+          description: 'Largura (e também altura, já que a imagem QRCode é renderizada como um quadrado) da imagem QRCode a ser gerada'
+          example: '400'
+          default: '400'
+        generateImageRendering:
+          type: boolean
+          description: ' Indica se deve gerar, além do conteúdo textual QRCode, também o conteúdo binário da imagem QRCode'
+          example: true
+          default: true
+      description: Geração da imagem QRCode
+    QRCodeStaticRequestTO:
+      required:
+        - accountHolderName
+        - accountNumber
+        - branch
+      type: object
+      properties:
+        branch:
+          type: string
+          description: Número da agência do beneficiário
+          example: '0001'
+        accountNumber:
+          type: string
+          description: Número da conta do beneficiario
+          example: '000012345'
+        imageGeneration:
+          $ref: '#/components/schemas/ImageGenerationRequestTO'
+        addressingKey:
+          $ref: '#/components/schemas/AddressingKeyRequestTO'
+        accountHolderName:
+          maxLength: 25
+          type: string
+          description: Nome do titular da conta
+          example: Nome do titular da conta
+        value:
+          type: string
+          description: Valor de pagamento
+          example: '123.43'
+        additionalInformation:
+          maxLength: 68
+          type: string
+          description: Informações adicionais em formato livre
+          example: Pagamento de José
+        reference:
+          maxLength: 25
+          type: string
+          description: Identificador de recebíveis usado pelo recebedor para identificar o pagamento/cobrança
+          example: QRS2-VVRYWK48C2C0SZ7ISSPW
+        withdrawAgent:
+          type: string
+          description: Indica o provedor de serviços de pagamento que está sendo realizada a retirada. Pode ser direto ou indireto
+          example: INDIRECT
+    ImageGenerationResponseTO:
+      required:
+        - actualImageWidth
+        - imageContent
+        - mimeType
+      type: object
+      properties:
+        imageContent:
+          type: string
+          description: O conteúdo binário da imagem QRCode codificado com Base64
+          example: FEADIAINUEIUNEIUAFDEFOEIFEAFEOIUINIUJNOIUNAEFDADAERADAEAERAENJIOJIONIONJNIJADAFADEAEAEAE
+        mimeType:
+          type: string
+          description: O tipo MIME do tipo de conteúdo da imagem
+          example: image/png
+        actualImageWidth:
+          type: string
+          description: Largura real da imagem em pixels
+          example: '800'
+    QRCodeStaticDataResponseTO:
+      required:
+        - textContent
+      type: object
+      properties:
+        textContent:
+          type: string
+          description: O conteúdo textual QRCode
+          example: 00020101021126440014br.gov.bcb.spi0122fulano2019@example.com5204000053039865802BR5913FULANO DE TAL6008BRASILIA6304DFE3
+        generatedImage:
+          $ref: '#/components/schemas/ImageGenerationResponseTO'
+      description: Dados da geração de QRCode estático
+    QRCodeStaticResponseTO:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/QRCodeStaticDataResponseTO'
+    AdditionalInformationV2RequestTO:
+      required:
+        - content
+        - name
+      type: object
+      properties:
+        name:
+          maxLength: 100
+          type: string
+          description: Descrição da informação adicional.
+        content:
+          maxLength: 200
+          type: string
+          description: Conteúdo da informação adicional.
+        showToPayer:
+          type: boolean
+          description: Indica se a informação adicional deve ser exibida ao pagador.
+          default: true
+      description: Informações adicionais do QRCode Dinâmico.
+    AddressRequestTO:
+      required:
+        - cep
+        - city
+        - street
+        - uf
+      type: object
+      properties:
+        street:
+          maxLength: 200
+          type: string
+          description: Rua
+          example: Rua Machado de Assis
+        city:
+          maxLength: 200
+          type: string
+          description: Cidade
+          example: São Paulo
+        uf:
+          maxLength: 2
+          type: string
+          description: Estado
+          example: SP
+        cep:
+          maxLength: 8
+          type: string
+          description: CEP
+          example: '13087500'
+      description: Informações de endereço.
+    BillingDueDatePayerInformationRequestTO:
+      required:
+        - cpfCnpj
+        - name
+      type: object
+      properties:
+        cpfCnpj:
+          maxLength: 14
+          type: string
+          description: CPF ou CNPJ do pagador.
+          example: '55567543576'
+        name:
+          maxLength: 200
+          type: string
+          description: Nome do pagador.
+          example: Gabriel Amaro
+        email:
+          type: string
+          description: Email do pagador.
+          example: matera@pix.com
+        addressing:
+          $ref: '#/components/schemas/AddressRequestTO'
+      description: Informações do pagador
+    BillingDueDatePaymentValueRequestTO:
+      type: object
+      properties:
+        documentValue:
+          type: number
+          description: 'Valor base de pagemento, antes de aplicar o desconto ou juros.'
+          example: 100
+        interests:
+          $ref: '#/components/schemas/InterestsRequestTO'
+        fines:
+          $ref: '#/components/schemas/FinesRequestTO'
+        discounts:
+          $ref: '#/components/schemas/DiscountsRequestTO'
+        reduction:
+          $ref: '#/components/schemas/ReductionRequestTO'
+        showPaymentValueInQrCode:
+          type: boolean
+          description: 'Especifica se o valor deve estar incluído no QRCode. Se false, será retornado apenas na URL do QRCode.'
+          example: true
+          default: true
+      description: Informações de pagamento do QRCode Dinâmico.
+    BillingDueDateReceiverInformationRequestTO:
+      required:
+        - addressing
+        - name
+        - taxId
+      type: object
+      properties:
+        taxId:
+          maxLength: 14
+          type: string
+          description: CPF ou CNPJ.
+          example: '40140930851'
+        name:
+          maxLength: 200
+          type: string
+          description: Nome do recebedor.
+          example: João Silva
+        tradeName:
+          maxLength: 200
+          type: string
+          description: Razão social.
+          example: João Silva S.A.
+        addressing:
+          $ref: '#/components/schemas/AddressRequestTO'
+      description: Informações do recebedor.
+    BillingDueDateRequestTO:
+      required:
+        - dueDate
+        - payerInformation
+        - paymentValue
+        - receiverInformation
+      type: object
+      properties:
+        dueDate:
+          type: string
+          description: Data do vencimento.
+          format: YYYY-MM-DD
+          example: '2020-03-31'
+        daysAfterDueDate:
+          type: integer
+          description: Quantidade de dias que o PSP recebedor aceita o pagamento do QRCode após o vecimento.
+          example: 30
+          default: 30
+        payerInformation:
+          $ref: '#/components/schemas/BillingDueDatePayerInformationRequestTO'
+        receiverInformation:
+          $ref: '#/components/schemas/BillingDueDateReceiverInformationRequestTO'
+        paymentValue:
+          $ref: '#/components/schemas/BillingDueDatePaymentValueRequestTO'
+      description: Dados da cobrança.
+    CashbackRequestTO:
+      required:
+        - cashbackType
+        - value
+        - withdrawProviders
+      type: object
+      properties:
+        allowValueChange:
+          type: boolean
+          description: Indica se o pagador tem permissão para alterar o valor do reembolso após ler o QRCode.
+          example: false
+          default: false
+        cashbackType:
+          type: string
+          description: Indica o tipo de reembolso a ser realizado
+          example: CHANGE
+          enum:
+            - CHANGE
+            - WITHDRAW
+        value:
+          type: string
+          description: Indica o valor do reembolso a ser realizado
+          example: '100'
+        withdrawProviders:
+          $ref: '#/components/schemas/WithdrawProvidersRequestTO'
+      description: 'Detalhes do reembolso, se o QRCode estiver relacionado a reembolso.'
+    DiscountsRequestTO:
+      type: object
+      properties:
+        modality:
+          type: integer
+          description: 'Modalidade. 1 - Valor Fixo até a[s] data[s] informada[s], 2 - Percentual até a data informada, 3 -  Valor por antecipação dia corrido, 4 - Valor por antecipação dia útil, 5 - Percentual por antecipação dia corrido, 6 - Percentual por antecipação dia útil'
+          format: int32
+          example: 2
+      description: Dados de desconto.
+      oneOf:
+        - $ref: '#/components/schemas/UniqueDiscountsRequestTO'
+        - $ref: '#/components/schemas/FixedDateDiscountRequestTO'
+    FinesRequestTO:
+      type: object
+      properties:
+        valuePerc:
+          type: number
+          description: Multa aplicada em valor ou percentual.
+          example: 100
+        modality:
+          type: integer
+          description: 'Modalidade. 1 - Valor Fixo, 2 - Percentual'
+          format: int32
+          example: 2
+      description: Dados de multas.
+    FixedDateDiscountRequestTO:
+      type: object
+      properties:
+        valuePerc:
+          type: number
+          description: Desconto aplicado em valor ou percentual.
+        date:
+          type: string
+          description: Data do desconto.
+          format: YYYY-MM-DD
+    ImmediatePaymentValueRequestTO:
+      required:
+        - documentValue
+        - modalityChange
+      type: object
+      properties:
+        cashback:
+          $ref: '#/components/schemas/CashbackRequestTO'
+        documentValue:
+          type: number
+          description: 'Valor base de pagemento, antes de aplicar o desconto ou juros.'
+          example: 100
+        showPaymentValueInQrCode:
+          type: boolean
+          description: 'Especifica se o valor deve estar incluído no QRCode. Se false, será retornado apenas na URL do QRCode.'
+          example: true
+          default: true
+        modalityChange:
+          type: string
+          description: Controla se o valor pode ser alterado pelo pagador. 0 para não ser possível e 1 para possível.
+          example: '0'
+          default: '0'
+      description: Informações de pagamento do QRCode Dinâmico.
+    ImmediateReceiverInformationRequestTO:
+      required:
+        - name
+        - taxId
+      type: object
+      properties:
+        taxId:
+          maxLength: 14
+          type: string
+          description: CPF ou CNPJ
+          example: '40140930851'
+        name:
+          maxLength: 200
+          type: string
+          description: Nome do recebedor.
+          example: João Silva
+        tradeName:
+          maxLength: 200
+          type: string
+          description: Razão social.
+          example: João Silva S.A.
+      description: Informações do recebedor.
+    ImmediateRequestTO:
+      required:
+        - expiration
+        - paymentValue
+      type: object
+      properties:
+        expiration:
+          minLength: 1
+          type: integer
+          description: 'Quantidade de segundos após a criação do QRCode Dinâmico, ou do vencimento se o mesmo for definido.'
+          example: 86400
+        paymentValue:
+          $ref: '#/components/schemas/ImmediatePaymentValueRequestTO'
+        payerInformation:
+          $ref: '#/components/schemas/PayerInformationRequestTO'
+        receiverInformation:
+          $ref: '#/components/schemas/ImmediateReceiverInformationRequestTO'
+    InterestsRequestTO:
+      type: object
+      properties:
+        valuePerc:
+          type: number
+          description: Juros aplicado.
+          example: 100
+        modality:
+          type: integer
+          description: 'Modalidade. 1 - Valor (dias corridos), 2 - Percentual ao dia (dias corridos), 3 - Percentual ao mês (dias corridos), 4 - Percentual ao ano (dias corridos), 5 -  Valor (dias úteis), 6 - Percentual ao dia (dias úteis), 7 - Percentual ao mês (dias úteis), 8 -  Percentual ao ano (dias úteis)'
+          format: int32
+          example: 2
+      description: Dados de juros.
+    PayerInformationRequestTO:
+      required:
+        - cpfCnpj
+        - name
+      type: object
+      properties:
+        cpfCnpj:
+          maxLength: 14
+          type: string
+          description: CPF ou CNPJ.
+          example: '23465776324'
+        name:
+          maxLength: 200
+          type: string
+          description: Nome do pagador.
+          example: Fulano de tal
+      description: Informações do pagador.
+    QRCodeDynamicSpecificationV2RequestTO:
+      required:
+        - accountHolderName
+        - addressingKey
+        - dynamicQRCodeType
+        - ownerModule
+      type: object
+      properties:
+        addressingKey:
+          $ref: '#/components/schemas/AddressingKeyRequestTO'
+        imageGeneration:
+          $ref: '#/components/schemas/ImageGenerationRequestTO'
+        accountHolderName:
+          maxLength: 25
+          type: string
+          description: Nome do titular da conta
+          example: Fulano da Silva
+        ownerModule:
+          maxLength: 10
+          type: string
+          description: Descrição do módulo Beneficiário que solicita o QRCode
+          example: MP
+        dynamicQRCodeType:
+          type: string
+          description: Tipo de QRCode Dinâmico
+          example: IMMEDIATE
+          enum:
+            - 'IMMEDIATE, BILLING_DUE_DATE'
+        immediate:
+          $ref: '#/components/schemas/ImmediateRequestTO'
+        billingDueDate:
+          $ref: '#/components/schemas/BillingDueDateRequestTO'
+        payerRequestInformation:
+          maxLength: 140
+          type: string
+          description: Campo usado para qualquer informação do pagador.
+          example: 'Por favor, informe a cor preferida antes do pagamento!'
+        additionalInformation:
+          type: array
+          description: Informações adicionais do QRCode Dinâmico.
+          items:
+            $ref: '#/components/schemas/AdditionalInformationV2RequestTO'
+        itemId:
+          maxLength: 300
+          type: string
+          description: 'Identidicador de transação único, usado para controle. O response referencia esse ID em cada resultado'
+          example: 3d0ca315-aff9–4fc2-be61–3b76b9a2d798
+        receiverTxId:
+          maxLength: 35
+          minLength: 26
+          type: string
+          description: Referência única para txId. Campo é opcional e deve ser único e conter apenas letras e números.
+          example: QRS1TXJSDU3DSSFDGFG44F256FDF
+    QRCodeDynamicV2RequestTO:
+      required:
+        - accountNumber
+        - branch
+      type: object
+      properties:
+        branch:
+          maxLength: 4
+          minLength: 1
+          type: string
+          description: Número da agência da conta.
+          example: '0001'
+        accountNumber:
+          maxLength: 20
+          minLength: 1
+          type: string
+          description: Número da conta.
+          example: '00007654398'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/QRCodeDynamicSpecificationV2RequestTO'
+    ReductionRequestTO:
+      type: object
+      properties:
+        valuePerc:
+          type: number
+          description: Redução aplicada à cobrança em valor ou percentual.
+          example: 100
+        modality:
+          type: integer
+          description: 'Modalidade. 1 - Valor Fixo, 2 - Percentual'
+          format: int32
+          example: 2
+      description: Dados de cálculo de redução.
+    UniqueDiscountsRequestTO:
+      type: object
+      properties:
+        uniqueValuePercDiscount:
+          type: number
+          description: Desconto aplicado as modalidades 3 ao 6
+    WithdrawProvidersRequestTO:
+      required:
+        - agentModality
+        - serviceProvider
+      type: object
+      properties:
+        agentModality:
+          type: string
+          description: Tipo do Agente/Estabelecimento que foi executado a retirada
+          example: AGPSS
+          enum:
+            - AGPSS
+            - AGTEC
+            - AGTOT
+        serviceProvider:
+          type: string
+          description: Indica um provedor de serviços de pagamento que está sendo realizada a retirada. Pode ser direto ou indireto
+          example: '1111111'
+      description: Detalhes da Retirada do PIX Saque/Troco
+    QRCodeDynamicDataV2ResponseTO:
+      type: object
+      properties:
+        items:
+          type: array
+          description: Array de objetos (Especificação de QRCode Dinâmico).
+          items:
+            $ref: '#/components/schemas/QRCodeDynamicSpecificationV2ResponseTO'
+      description: Resultado do processamento do lote de QRCodes.
+    QRCodeDynamicSpecificationDataV2ResponseTO:
+      required:
+        - qrcodeURL
+        - textContent
+      type: object
+      properties:
+        textContent:
+          type: string
+          description: Conteúdo de texto do QRCode.
+        reference:
+          maxLength: 35
+          type: string
+          description: Identificador usado pelo recebedor para identificar o pagamento.
+        generatedImage:
+          $ref: '#/components/schemas/ImageGenerationResponseTO'
+        qrcodeURL:
+          maxLength: 77
+          type: string
+          description: URL pública de informações do QRCode.
+      description: Dados do QRCode Dinâmico.
+    QRCodeDynamicSpecificationV2ResponseTO:
+      required:
+        - itemId
+      type: object
+      properties:
+        itemId:
+          maxLength: 300
+          type: string
+          description: Item ID
+        data:
+          $ref: '#/components/schemas/QRCodeDynamicSpecificationDataV2ResponseTO'
+      description: Array de objetos (Especificação de QRCode Dinâmico).
+    QRCodeDynamicV2ResponseTO:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/QRCodeDynamicDataV2ResponseTO'
+    AdditionalInformationRequestTO:
+      required:
+        - content
+        - name
+      type: object
+      properties:
+        name:
+          maxLength: 50
+          type: string
+          description: Título da informação
+        content:
+          maxLength: 200
+          type: string
+          description: Descrição da informação
+        showToPayer:
+          type: boolean
+          description: Controla se o pagador deve visualizar as informações adicionais.
+          default: true
+      description: Coleção de informações adicionais para QRCodes dinâmicos que são mostrados ao pagador pelo PSP do pagador.
+    QRCodeDynamicReviseV2RequestTO:
+      required:
+        - accountHolderName
+        - addressingKey
+        - dynamicQRCodeType
+        - ownerModule
+      type: object
+      properties:
+        billingDueDate:
+          $ref: '#/components/schemas/BillingDueDateRequestTO'
+        addressingKey:
+          $ref: '#/components/schemas/AddressingKeyRequestTO'
+        imageGeneration:
+          $ref: '#/components/schemas/ImageGenerationRequestTO'
+        accountHolderName:
+          maxLength: 25
+          type: string
+          description: Nome do titular da conta
+          example: PIX
+        ownerModule:
+          maxLength: 10
+          type: string
+          description: Descrição do módulo que solicitou o QRCode
+          example: MP
+        dynamicQRCodeType:
+          type: string
+          description: Tipo de QRCode dinâmico.
+          example: IMMEDIATE
+          enum:
+            - IMMEDIATE
+            - BILLING_DUE_DATE
+        immediate:
+          $ref: '#/components/schemas/ImmediateRequestTO'
+        payerRequestInformation:
+          maxLength: 140
+          type: string
+          description: Campo para solicitar informações do pagador. A resposta deve ser enviada pelo PSP do pagador na mensagem ao Banco Central
+          example: Please inform preferred color before payment!
+        additionalInformation:
+          type: array
+          description: Coleção de informações adicionais para QRCodes dinâmicos que são mostrados ao pagador pelo PSP do pagador.
+          items:
+            $ref: '#/components/schemas/AdditionalInformationRequestTO'
+    QRCodeDynamicReviseV2ResponseTO:
+      type: object
+      properties:
+        textContent:
+          type: string
+        reference:
+          type: string
+          description: Gerado quando o QRCode foi emitido.
+          example: QRS1TXJSDU3DSSFDGFG44F2565
+        qrcodeURL:
+          type: string
+          description: URL do QRcode
+          example: pix.matera.com/qrs1/01awRyTl1jVtANCMovEKlvxAMVJygn4W4TT2JTKcMkGIDe7HCxrKCr456
+        generatedImage:
+          $ref: '#/components/schemas/ImageGenerationResponseTO'
+    AnalysisResultResponseTO:
+      type: object
+      properties:
+        analysisResult:
+          type: string
+          description: O resultado da análise feita pelo PSP destinatário.
+          example: PARTIALLY_ACCEPTED
+          enum:
+            - TOTALLY_ACCEPTED
+            - PARTIALLY_ACCEPTED
+            - REJECTED
+        analysisDetails:
+          maxLength: 2000
+          type: string
+          description: Detalhes do PSP que fez a análise.
+          example: 'Fraude não detectada, recebedor idôneo.'
+        refundRejectionReason:
+          type: string
+          description: Motivo para rejeitar o pedido de devolução quando o resultado da análise for apenas REJEITADO (REJECTED).
+          example: CANNOT_REFUND
+          enum:
+            - NO_BALANCE
+            - ACCOUNT_CLOSURE
+            - CANNOT_REFUND
+      description: Especificação dos dados do resultado da análise da solicitação de devolução.
+    DataPixDisputeResponseTO:
+      type: object
+      properties:
+        mipRefundRequestId:
+          maxLength: 36
+          type: string
+          description: Identificador MIP de devolução.
+          example: 1f075743-476c-4cfb-af16-fbcaa617965c
+        dictRefundRequestId:
+          maxLength: 36
+          type: string
+          description: Identificador de solicitação da devolução do Banco Central para as solicitações feitas pelo PSP local.
+          example: df5faf97-e8cb-43fd-ae9c-ab6c79549d8a
+        status:
+          type: string
+          description: Status de devolução no MIP.
+          example: CANCELLED
+          enum:
+            - PENDING_OPENING
+            - OPEN
+            - PENDING_CANCELLING
+            - CANCELLED
+            - PENDING_CLOSING
+            - CLOSED
+            - PENDING_FINANCIAL_ACTIONS
+            - WAITING_RETURN_PROCESSING
+        creationTimeUtc:
+          type: string
+          description: Data/hora de criação de solicitação da devolução.
+          example: '2019-08-24T14:15:22Z'
+        requestingParticipant:
+          maxLength: 8
+          type: string
+          description: Identificador SPB do participante que solicita a devolução.
+          example: '99999011'
+        contestedParticipant:
+          maxLength: 8
+          type: string
+          description: Identificador SPB contestado.
+          example: '99999010'
+        originalSpecification:
+          $ref: '#/components/schemas/OriginalSpecificationResponseTO'
+        originalTransaction:
+          $ref: '#/components/schemas/OriginalTransactionCustomerResponseTO'
+        refund:
+          $ref: '#/components/schemas/RefundResponseTO'
+        previousInfractionReport:
+          $ref: '#/components/schemas/PreviousInfractionResponseTO'
+        analysisResult:
+          $ref: '#/components/schemas/AnalysisResultResponseTO'
+      description: Dados do retorno de devolução
+    OriginalSpecificationResponseTO:
+      type: object
+      properties:
+        refundReason:
+          type: string
+          description: Motivo da solicitação da devolução
+          enum:
+            - FRAUD
+            - OPERATION_FLAW
+            - REFUND_CANCELLED
+        refundAmount:
+          type: number
+          description: Total de reembolso da solicitação de devolução
+          format: float
+        refundDetails:
+          maxLength: 2000
+          type: string
+          description: Detalhes da solicitação de devolução
+          example: Devolução feita por x motivo
+      description: Especificação atual da solicitação de devolução.
+    OriginalTransactionCustomerResponseTO:
+      type: object
+      properties:
+        transactionId:
+          type: string
+          example: E9999901012341234123412345678900
+        customer:
+          $ref: '#/components/schemas/CustomerTO'
+      description: A transação original à qual a solicitação de devolução se refere.
+    PreviousInfractionResponseTO:
+      type: object
+      properties:
+        mipInfractionReportId:
+          maxLength: 36
+          type: string
+          description: Identificador do Relatório de Infração do MIP.
+          example: af206260-2f3e-4f1b-91b5-b94c5e6635f9
+        dictInfractionReportId:
+          maxLength: 36
+          type: string
+          description: Identificador do Relatório de Infração do DICT.
+          example: 60f6070c-3d0d-484b-abeb-1d9f7f2b03cd
+      description: 'Dados de um Relatório de infração anterior associado à solicitação de devolução, se houver.'
+    RefundPixDisputeResponseTO:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DataPixDisputeResponseTO'
+    RefundResponseTO:
+      type: object
+      properties:
+        refundValue:
+          type: number
+          description: 'Valor devolvido (ou que será devolvido) nesta solicitação de devolução. Pode ser diferente do refundAmount solicitado ao PSP inicial ou do valor da transação original, porque o valor ainda disponível para ser devolvido da transação original pode ser diferente. Essas informações são retornadas apenas para Solicitações de Reembolso em que o PSP local é o destinatário da solicitação.'
+          format: float
+          example: 150.75
+        refundTransactionId:
+          maxLength: 32
+          type: string
+          description: rtrId do pacs.004 ou endToEndId do pacs.008 usado para retornar a quantia.
+          example: coloque aqui o rtrId do pacs.004 ou endToEndId do pac.008
+        returnErrorCode:
+          maxLength: 4
+          type: string
+          description: 'Código de razão do erro, retornado em uma mensagem pacs.002 indicando que a mensagem de devolução não foi processada com sucesso.'
+          example: '6424'
+        debitSettlementId:
+          type: string
+          description: 'Para devoluções efetuadas pelo MIP, este é o ID de liquidação do débito efetuado na conta do cliente para efetuar a devolução.Esta informação é devolvida apenas para pedidos de devolução em que o PSP local é o destinatário do pedido.'
+          example: este é o ID de liquidação do débito efetuado na conta do cliente para efetuar a devolução.
+      description: Especificação atual dos valores de uma solicitação de devolução.
+    RefundClosureTO:
+      type: object
+      properties:
+        analysisResult:
+          type: string
+          description: 'Resultado da solicitacão: | TOTALLY_ACCEPTED | PARTIALLY_ACCEPTED | REJECTED'
+          example: TOTALLY_ACCEPTED
+        analysisDetails:
+          type: string
+          description: Comentario do PSP que realisou a analise
+          example: isso é apenas um exemplo de texto
+        refundTransactionId:
+          type: string
+          description: 'Mensagem enviada para o retorno da quantia, ou endToEndID, deve ser informado quando analysisResult for diferente de "REJECTED"'
+          example: D11111111201907261559y6j6mt9l0pi
+        refundValue:
+          type: string
+          description: |-
+            Valor efetivamente devolvido na solicitacao de devolucao, 
+            deve ser informado quando o campo analysisResult for diferente de "REJECTED"
+          example: '174.85'
+        refundRejectionReason:
+          type: string
+          description: 'Enum: NO_BALANCE ACCOUNT_CLOSURE CANNOT_REFUND Motivo para rejeitar o pedido de reembolso. Deve estar presente quando analysisResultfor REJECTED.'
+          example: NO_BALANCE
+    RefundPixDisputeRequestTO:
+      required:
+        - refundReason
+        - transactionId
+      type: object
+      properties:
+        refundReason:
+          type: string
+          description: Motivo do pedido de devolução.
+          example: FRAUD
+          enum:
+            - FRAUD
+            - OPERATION_FLAW
+            - REFUND_CANCELLED
+        refundAmount:
+          type: string
+          description: Quantidade solicitada para devolução.
+          example: '100.08'
+        refundDetails:
+          type: string
+          description: Motivo do pedido de devolução.
+          example: Devolvendo para ajustes de métricas
+        transactionId:
+          type: string
+          description: Identificação da transação da solicitação de devolução. É o endToEndId de um PIX (para solicitações com motivos FRAUD ou OPERATION_FLAW) ou o RtrId de uma pacs.004 (para solicitações com motivo REFUND_CANCELLED).
+          example: E9999901012341234123412345678900
+    PageableSettlementResponseTO:
+      type: object
+      properties:
+        pageNumber:
+          type: string
+          example: '0'
+        pageSize:
+          type: string
+          example: '5'
+        offset:
+          type: string
+          example: '0'
+        unpaged:
+          type: boolean
+          example: false
+        paged:
+          type: boolean
+          example: true
+    RetrieveSettlementDataResponseTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/SettlementContentResponseTO'
+        pageable:
+          $ref: '#/components/schemas/PageableSettlementResponseTO'
+        totalPages:
+          type: string
+          description: Total de Paginas
+          example: '0'
+        totalElements:
+          type: string
+          description: Total de Elementos
+          example: '0'
+        last:
+          type: string
+          example: 'true'
+        first:
+          type: string
+          example: 'true'
+        sort:
+          $ref: '#/components/schemas/SortSettlementResponseTO'
+        number:
+          type: string
+          example: '0'
+        numberOfElements:
+          type: string
+          example: '0'
+        size:
+          type: string
+          example: '0'
+        empty:
+          type: string
+          example: 'true'
+      description: Listagem de liquidações
+    RetrieveSettlementResponseTO:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/RetrieveSettlementDataResponseTO'
+    SettlementContentResponseTO:
+      required:
+        - initiationForm
+        - originSystem
+      type: object
+      properties:
+        eventId:
+          type: string
+          description: Identificação da liquidação.
+          example: caeb9323-d595-4ed9-a389-0738333b6fb0
+        payer:
+          $ref: '#/components/schemas/SettlementPayerResponseTO'
+        receiver:
+          $ref: '#/components/schemas/SettlementReceiverResponseTO'
+        endToEndId:
+          pattern: '[E|D][0-9]{8}[0-9]{4}[0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][a-zA-Z0-9]{11}'
+          type: string
+          description: 'Identificador único gerado pelo sistema para realizar a consulta da chave no DICT. Este campo, quando retornado, deve ser utilizado no pagamento, para que seja possível relacionar a consulta da chave Pix com o pagamento'
+          example: '|41858281608302272740ulCZUlVDGZ5'
+        originalEndToEndId:
+          pattern: '[E|D][0-9]{8}[0-9]{4}[0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][a-zA-Z0-9]{11}'
+          type: string
+          description: 'Identificador único do evento original, existe apenas em devoluções de PIX enviadas ou recebidas.'
+          example: D804475320590052101500R7BrN6i0NU
+        originalAmount:
+          type: string
+          description: Valor de liquidação original.
+          example: '1637.13'
+        maximumAmountReturn:
+          type: string
+          description: 'Quantidade que pode ser devolvida. No caso de RECIBO, trata-se do valor que ainda pode ser devolvido ao pagador. No caso de PAGAMENTO, significa o valor que ainda pode ser devolvido pelo destinatário.'
+          example: '1637.13'
+        receiverReconciliationIdentifier:
+          maxLength: 35
+          type: string
+          description: Identificador de recebíveis usado pelo recebedor para identificar o pagamento/cobrança.
+          example: '9999995555'
+        additionalInformation:
+          maxLength: 140
+          type: string
+          description: Informações adicionais em formato livre.
+          example: Pagamento de José
+        effectiveSettlementDate:
+          type: string
+          description: 'Timestamp, em UTC, quando a liquidação foi efetivada pelo Banco Central. Máscara: AAAA-MM-DDTHH:MM:SS.'
+          example: '2022-05-26T17:37:02.246Z'
+        customerInitiationTimestampUTC:
+          type: string
+          description: 'Timestamp, em UTC, quando o início do pagamento foi recebido do cliente pagador. Máscara: AAAA-MM-DDTHH:MM:SS.'
+          example: '2022-05-26T17:37:02.246Z'
+        originalSystemTransactionIdentifier:
+          maxLength: 100
+          type: string
+          description: Identificador da transação no sistema de origem.
+          example: ident123
+        initiatingInstitution:
+          type: string
+          description: CNPJ da instituição que efetivamente iniciou este pagamento.
+          example: '19755844000170'
+        informationAccountHolder:
+          maxLength: 128
+          type: string
+          description: Referência do sistema de origem
+          example: bdcd0123-10a7-4d13-826d-f8474b9e7b0f
+        originSystem:
+          maxLength: 100
+          type: string
+          description: Identificador do sistema de origem
+          example: CONVENIOS
+        eventType:
+          type: string
+          description: Tipo do evento.
+          enum:
+            - ALL
+            - PAYMENT
+            - RECEIPT
+            - RETURN_SENT
+            - RETURN_RECEIVED
+        eventStatus:
+          type: string
+          description: Descrição do status do evento.
+          example: PAYMENT_INITIALIZED
+          enum:
+            - ALL
+            - PAYMENT_INITIALIZED
+            - WAITING_PAYMENT_CONFIRM
+            - PAYMENT_REJECTED
+            - WAITING_CREDIT_VALIDATION
+            - SUCCESS
+            - PAYMENT_REJECTED_BY_CLEARING
+            - ERROR
+            - UNCONFIRMED_OPERATION
+            - PAYMENT_WAITING_APPROVAL
+            - RECEIPT_RECEIVED
+            - WAITING_RECEIPT_CONFIRM
+            - RECEIPT_REJECTED
+            - RECEIPT_REJECTION_CONFIRMED
+            - RECEIPT_REJECTED_BY_CLEARING
+            - PENDING_PROCESSING
+            - RETURN_INITIATED
+            - RETURN_REJECTED
+            - WAITING_RETURN_CONFIRM
+            - RETURN_REJECTED_BY_CLEARING
+            - RETURN_WAITING_APPROVAL
+            - RETURN_RECEIVED
+            - RETURN_REJECTION_CONFIRMED
+            - PENDING_CREDIT_ACCOUNT_HOLDER
+        settlementId:
+          type: string
+          description: Identificador do lançamento a débito efetuado pelo sistema de origem. Máximo de 150 dígitos.
+          example: '123456'
+        customerDebitMadeByMip:
+          type: string
+          description: Indica se o MIP debitou a conta do titular da conta.
+          example: 'true'
+        initiationForm:
+          type: string
+          description: 'Forma de início de pagamento. Indica se o pagamento foi iniciado: com dados manuais (MANU), por chave de endereçamento (DICT), Código QR estático (QRES) ou Código QR dinâmico (QRDN)'
+          enum:
+            - MANU
+            - DICT
+            - QRES
+            - QRDN
+        instructionType:
+          type: string
+          description: 'Indica se é um pagamento prioritário (PAGPRI), um pagamento programado (PAGAGD) ou um pagamento que passou por validação antifraude (PAGFRD).'
+          enum:
+            - PAGPRI
+            - PAGFRD
+            - PAGAGD
+          default: PAGPRI
+        transactionPurpose:
+          type: string
+          description: 'Objetivo da transação, que pode ser: transação ou compra (IPAY). Compre com troco (GSCB) ou retire (OTHR).'
+          enum:
+            - IPAY
+            - GSCB
+            - OTHR
+          default: IPAY
+        instructionPriority:
+          type: string
+          description: Indica a prioridade da instrução. O valor padrão é HIGH.
+          example: HIGH
+          enum:
+            - HIGH
+            - NORM
+        transactionValuesDetails:
+          $ref: '#/components/schemas/TransactionValuesDetailsRequestTO'
+        indirectTransactionId:
+          type: string
+          description: Valor retornado pelo indireto no momento da validação de crédito de PIX recebido.
+    SettlementPayerResponseTO:
+      required:
+        - account
+      type: object
+      properties:
+        account:
+          $ref: '#/components/schemas/AccountResponseTO'
+        name:
+          type: string
+          description: Nome do proprietário da conta.
+          example: John Doe
+        taxId:
+          type: string
+          description: CPF ou CNPJ da conta do proprietário. Pode conter apenas números ou traços e pontos.
+          example: '07795497000120'
+        institutionIspb:
+          type: string
+          description: Identificador da Instituição
+          example: '00123456'
+      description: Dados do pagador.
+    SettlementReceiverResponseTO:
+      required:
+        - account
+        - taxId
+      type: object
+      properties:
+        account:
+          $ref: '#/components/schemas/AccountResponseTO'
+        addressingKey:
+          maxLength: 2048
+          type: string
+          description: Chave Pix do recebedor.
+          example: john.doe@mail.com
+        taxId:
+          type: string
+          description: CPF ou CNPJ da conta do proprietário. Pode conter apenas números ou traços e pontos.
+        institutionIspb:
+          type: string
+          description: Identificador da Instituição
+          example: '00123456'
+      description: Dados do recebedor.
+    SortSettlementResponseTO:
+      type: object
+      properties:
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+        empty:
+          type: boolean
+    TransactionValuesDetailsRequestTO:
+      type: object
+      properties:
+        transactionValue:
+          maximum: 10000000000000000
+          type: string
+          description: Valor que corresponde ao valor de compra. Este campo deve ser preenchido quando o objetivo da transação for Compra com Troco (GSCB).
+          example: '123.99'
+        cashValue:
+          maximum: 10000000000000000
+          type: string
+          description: Montante correspondente à alteração (GSCB) ou retirada (OTHR).
+          example: '20'
+      description: Detalhes da Transação.
+    InstantPaymentReturnRequestTO:
+      required:
+        - originSystem
+        - returnReasonCode
+        - returnedAmount
+      type: object
+      properties:
+        originSystem:
+          maxLength: 100
+          type: string
+          description: Identificador do sistema de origem
+          example: CONVENIOS
+        returnedAmount:
+          maximum: 99999999999999.98
+          type: string
+          description: Valor da devolução. Pode ser valor parcial ou valor total
+          example: '1773.01'
+        returnType:
+          type: string
+          description: Indica a natureza da devolução.
+          example: TransactionValue
+          enum:
+            - TransactionValue
+            - CashValue
+            - OperationFlaw
+            - Fraud
+        additionalInformation:
+          maxLength: 140
+          type: string
+          description: Informações adicionais em formato livre
+          example: Devolução enviada banco 000000000
+        returnReasonCode:
+          type: string
+          description: O código de devolução
+          example: AM05
+        returnReasonInformation:
+          maxLength: 105
+          type: string
+          description: Motivo da devolução
+        demandsImmediateReturn:
+          type: boolean
+          description: Indica se o sistema do cliente deve ou não esperar pelo pagamento passar pelo processo de aprovação.
+          example: true
+        informationAccountHolder:
+          maxLength: 128
+          type: string
+          description: Referência do sistema de origem
+        historicComplement:
+          maxLength: 40
+          type: string
+          description: Complemento de histórico.
+          example: Conta de Luz
+        instructionPriority:
+          type: string
+          description: Indica a prioridade da instrução. O valor padrão é HIGH.
+          example: NORM
+          enum:
+            - HIGH
+            - NORM
+        settlementId:
+          maxLength: 150
+          type: string
+          description: Identificador do registro de débito.
+          example: '123456'
+        performCustomerDebit:
+          type: boolean
+          description: Indica se o sistema deve debitar da conta.
+          example: true
+        originalSystemTransactionIdentifier:
+          maxLength: 100
+          type: string
+          description: Identificador da transação no sistema de origem.
+          example: ident123
+    InstantPaymentReturnDataResponseTO:
+      type: object
+      properties:
+        returnId:
+          type: string
+          description: Identificador único de devolução
+          example: 361a4b7a-0618-4821-9f05-b57d0fa26d1c
+        creationDateTime:
+          type: string
+          description: Data e hora em que a devolução foi solicitada
+          example: '2019-11-19T14:56:16'
+        originalInstantPaymentId:
+          maxLength: 100
+          type: string
+          description: Identificador da transação original que será devolvida
+          example: '57376820200217082881978247566'
+        returnedAmount:
+          maximum: 99999999999999.98
+          type: string
+          description: Valor da devolução. Pode ser valor parcial ou valor total
+          example: '1773.01'
+        endToEndId:
+          type: string
+          description: Identificação única de liquidação no Banco Central
+          example: E0057376820200217082881978247566
+        settlementId:
+          maxLength: 150
+          type: string
+          description: Identificador do registro de débito.
+          example: '123456'
+        customerDebitMadeByMip:
+          type: boolean
+          description: Indica se o MIP debitou da conta do títular.
+          example: true
+        originalSystemTransactionIdentifier:
+          maxLength: 100
+          type: string
+          description: Identificador da transação no sistema de origem.
+          example: CONVENIOS
+    InstantPaymentReturnResponseTO:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/InstantPaymentReturnDataResponseTO'
+    InstantPaymentSettlementRequestTO:
+      required:
+        - payer
+        - receiver
+        - value
+      type: object
+      properties:
+        receiver:
+          $ref: '#/components/schemas/SettlementReceiverRequestTO'
+        payer:
+          $ref: '#/components/schemas/SettlementPayerRequestTO'
+        value:
+          type: string
+          description: Valor do pagamento. Máximo de 2 dígitos fracionários permitidos.
+          example: '1773.01'
+        additionalInformation:
+          maxLength: 140
+          type: string
+          description: Informações adicionais em formato livre.
+          example: Pagamento de Gabriel
+        receiverReconciliationIdentifier:
+          maxLength: 35
+          type: string
+          description: Identificador de recebíveis usado pelo recebedor para identificar o pagamento/cobrança.
+          example: '9999995555'
+        customerInitiationTimestampUTC:
+          type: string
+          description: 'Timestamp, em UTC, quando o início do pagamento foi recebido do cliente pagador. Máscara: AAAA-MM-DDTHH: MM: SS.'
+          example: '2019-11-19T14:56:16'
+        originalSystemTransactionIdentifier:
+          maxLength: 100
+          type: string
+          description: Identificador da transação no sistema de origem.
+          example: ident123
+        initiatingInstitution:
+          type: string
+          description: CNPJ da instituição que efetivamente iniciou este pagamento.
+          example: '19755844000170'
+        demandsImmediateReturn:
+          type: boolean
+          description: Indicador se o sistema do cliente aceita ou não espera que o pagamento passe pelo processo de aprovação.
+          example: true
+        historicComplement:
+          maxLength: 40
+          type: string
+          description: Complemento de histórico.
+          example: Conta de Luz
+        informationAccountHolder:
+          maxLength: 128
+          type: string
+          description: Referência do sistema de origem
+          example: bdcd0123-10a7-4d13-826d-f8474b9e7b0f
+        originSystem:
+          maxLength: 100
+          type: string
+          description: Identificador do sistema de origem.
+          example: CONVENIOS
+        instructionPriority:
+          type: string
+          description: Indica a prioridade da instrução. O valor padrão é HIGH.
+          example: HIGH
+          enum:
+            - HIGH
+            - NORM
+    SettlementPayerAccountRequestTO:
+      required:
+        - accountNumber
+        - accountType
+      type: object
+      properties:
+        branch:
+          maxLength: 35
+          type: string
+          description: Número da agência da conta.
+          example: '1111'
+        accountNumber:
+          maxLength: 34
+          type: string
+          description: Número da conta.
+          example: '1234567899'
+        accountType:
+          type: string
+          description: 'Tipo de conta. Possíveis valores: *CACC = conta corrente. *SLRY = conta salário. *SVGS = conta poupança. *TRAN = conta de pagamento (só deve ser usada na v2)'
+          example: CACC
+          enum:
+            - CACC
+            - SLRY
+            - SVGS
+            - TRAN
+      description: Identificação da conta.
+    SettlementPayerRequestTO:
+      required:
+        - account
+        - name
+      type: object
+      properties:
+        account:
+          $ref: '#/components/schemas/SettlementPayerAccountRequestTO'
+        name:
+          maxLength: 140
+          type: string
+          description: Nome do pagador.
+          example: Rodrigo Aguiar
+        taxId:
+          maxLength: 14
+          type: string
+          description: Cadastro do pagador (CPF ou CNPJ) sem máscara. Obrigatório para participantes indiretos.
+          example: '22133503021'
+        checkCustomerAccountBalance:
+          type: boolean
+          description: 'Indicador para validar ou não o saldo da conta do titular na hora de efetuar o lançamento a débito. Caso não seja informado, o sistema utilizará o valor configurado na conta.'
+          example: true
+        personType:
+          type: string
+          description: O tipo de identificação fiscal do pagador pode ser pessoa física (PF) ou pessoa jurídica (PJ).
+          example: PF
+          enum:
+            - PF
+            - PJ
+      description: Informações do pagador da liquidação.
+    SettlementReceiverAccountRequestTO:
+      required:
+        - accountNumber
+        - accountType
+      type: object
+      properties:
+        branch:
+          maxLength: 35
+          type: string
+          description: Número da agência da conta.
+          example: '1020'
+        accountNumber:
+          maxLength: 34
+          type: string
+          description: Número da conta.
+          example: '102030'
+        accountType:
+          type: string
+          description: 'Tipo de conta. Possíveis valores: *CACC = conta corrente. *SVGS = conta poupança. *TRAN = conta de pagamento (só deve ser usada na v2)'
+          enum:
+            - CACC
+            - SVGS
+            - TRAN
+      description: Identificação da conta.
+    SettlementReceiverRequestTO:
+      required:
+        - account
+        - receiverInstitutionISPB
+        - receiverTaxId
+      type: object
+      properties:
+        receiverInstitutionISPB:
+          maximum: 99999999
+          type: string
+          description: Identificador (ISPB) da instituição da conta do recebedor.
+          example: '12345678'
+        receiverTaxId:
+          maxLength: 14
+          type: string
+          description: Cadastro do recebedor (CPF ou CNPJ) sem máscara.
+          example: '13134090000155'
+        addressingKey:
+          maxLength: 2048
+          type: string
+          description: Chave Pix do recebedor.
+          example: email@mail.com
+        endToEndIdQuery:
+          maxLength: 32
+          type: string
+          description: Identificador retornado na consulta da chave Pix. Campo para controlar que uma consulta de chave seja feita apenas para obter os dados necessários para efetuar um pagamento. Este campo deve ser informado quando a chave Pix for informada.
+          example: E0057376820200217082881978247566
+        account:
+          $ref: '#/components/schemas/SettlementReceiverAccountRequestTO'
+      description: 'Informações do recebedor. Ao especificar a conta do recebedor, deve ser fornecida uma e apenas uma das chaves de endereçamento e identificação da conta.'
+    EventStatusResponseTO:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Código do evento.
+          example: '4'
+        description:
+          type: string
+          description: Descrição do status do evento.
+          enum:
+            - ALL
+            - PAYMENT_INITIALIZED
+            - WAITING_PAYMENT_CONFIRM
+            - PAYMENT_REJECTED
+            - WAITING_CREDIT_VALIDATION
+            - SUCCESS
+            - PAYMENT_REJECTED_BY_CLEARING
+            - ERROR
+            - UNCONFIRMED_OPERATION
+            - PAYMENT_WAITING_APPROVAL
+            - RECEIPT_RECEIVED
+            - WAITING_RECEIPT_CONFIRM
+            - RECEIPT_REJECTED
+            - RECEIPT_REJECTION_CONFIRMED
+            - RECEIPT_REJECTED_BY_CLEARING
+            - PENDING_PROCESSING
+            - RETURN_INITIATED
+            - RETURN_REJECTED
+            - WAITING_RETURN_CONFIRM
+            - RETURN_REJECTED_BY_CLEARING
+            - RETURN_WAITING_APPROVAL
+            - RETURN_RECEIVED
+            - RETURN_REJECTION_CONFIRMED
+            - PENDING_CREDIT_ACCOUNT_HOLDER
+      description: Dados do evento.
+    InstantPaymentDataResponseTO:
+      required:
+        - instantPaymentId
+        - originSystem
+        - payer
+        - receiver
+      type: object
+      properties:
+        receiver:
+          $ref: '#/components/schemas/ReceiverResponseTO'
+        payer:
+          $ref: '#/components/schemas/PayerResponseTO'
+        eventStatus:
+          $ref: '#/components/schemas/EventStatusResponseTO'
+        value:
+          type: string
+          description: Valor do pagamento contendo até duas casas decimais.
+          example: '145.98'
+        receiverReconciliationIdentifier:
+          maxLength: 35
+          type: string
+          description: Identificador de recebíveis usado pelo recebedor para identificar o pagamento/cobrança.
+          example: '9999995555'
+        additionalInformation:
+          maxLength: 140
+          type: string
+          description: Informações adicionais em formato livre.
+          example: Pagamento de Gabriel
+        customerInitiationTimestampUTC:
+          type: string
+          description: 'Timestamp, em UTC, quando o início do pagamento foi recebido do cliente pagador. Máscara: AAAA-MM-DDTHH:MM:SSZ'
+          example: '2022-05-26T16:37:43.464Z'
+        originalSystemTransactionIdentifier:
+          maxLength: 100
+          type: string
+          description: Identificador da transação no sistema de origem.
+          example: ident123
+        initiatingInstitution:
+          type: string
+          description: CNPJ da instituição que efetivamente iniciou este pagamento.
+          example: '19755844000170'
+        demandsImmediateReturn:
+          type: boolean
+          description: Indica se o sistema do cliente deve ou não esperar pelo pagamento passar pelo processo de aprovação.
+          example: true
+        historicComplement:
+          maxLength: 40
+          type: string
+          description: Complemento de histórico.
+          example: Conta de Luz
+        informationAccountHolder:
+          maxLength: 128
+          type: string
+          description: Referência do sistema de origem
+          example: bdcd0123-10a7-4d13-826d-f8474b9e7b0f
+        originSystem:
+          maxLength: 100
+          type: string
+          description: Identificador do sistema de origem
+          example: CONVENIOS
+        instructionPriority:
+          type: string
+          description: Indica a prioridade da instrução. O valor padrão é HIGH.
+          example: HIGH
+          enum:
+            - HIGH
+            - NORM
+        instantPaymentId:
+          maxLength: 128
+          type: string
+          description: Identificador da transação.
+          example: bdcd0123-10a7-4d13-826d-f8474b9e7b0f
+        endToEndId:
+          type: string
+          description: Identificação única de liquidação no Banco Central
+          example: E0057376820200217082881978247566
+    InstantPaymentSettlementResponseTO:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/InstantPaymentDataResponseTO'
+    PayerResponseTO:
+      required:
+        - account
+        - name
+      type: object
+      properties:
+        account:
+          $ref: '#/components/schemas/AccountResponseTO'
+        checkCustomerAccountBalance:
+          type: boolean
+          description: 'Indicador para validar ou não o saldo da conta do titular na hora de efetuar o lançamento a débito. Caso não seja informado, o sistema utilizará o valor configurado na conta.'
+          example: true
+        name:
+          maxLength: 140
+          type: string
+          description: Nome do pagador.
+          example: José Silva
+        taxId:
+          maxLength: 14
+          type: string
+          description: Cadastro do pagador (CPF ou CNPJ) sem máscara. Obrigatório para participantes indiretos.
+          example: '22133503021'
+        personType:
+          type: string
+          description: O tipo de identificação fiscal do pagador pode ser pessoa física (PF) ou pessoa jurídica (PJ).
+          example: PJ
+          enum:
+            - PF
+            - PJ
+      description: Dados do pagador.
+    ReceiverResponseTO:
+      required:
+        - account
+        - receiverInstitutionISPB
+        - receiverTaxId
+      type: object
+      properties:
+        receiverInstitutionISPB:
+          maximum: 99999999
+          type: string
+          description: Identificador (ISPB) da instituição da conta do recebedor.
+          example: '12345678'
+        receiverTaxId:
+          maxLength: 14
+          type: string
+          description: Cadastro do recebedor (CPF ou CNPJ) sem máscara.
+          example: '13134090000155'
+        addressingKey:
+          maxLength: 2048
+          type: string
+          description: Chave Pix do recebedor.
+          example: email@mail.com
+        endToEndIdQuery:
+          maxLength: 32
+          type: string
+          description: Identificador retornado na consulta da chave Pix. Campo para controlar que uma consulta de chave seja feita apenas para obter os dados necessários para efetuar um pagamento. Este campo deve ser informado quando a chave Pix for informada.
+          example: E0057376820200217082881978247566
+        account:
+          $ref: '#/components/schemas/AccountResponseTO'
+      description: Dados do recebedor.
+    InstantPaymentSettlementV2RequestTO:
+      required:
+        - initiationForm
+        - payer
+        - receiver
+        - value
+      type: object
+      properties:
+        receiver:
+          $ref: '#/components/schemas/SettlementReceiverRequestTO'
+        payer:
+          $ref: '#/components/schemas/SettlementPayerRequestTO'
+        value:
+          type: string
+          description: Valor do pagamento. Máximo de 2 dígitos fracionários permitidos.
+          example: '1773.01'
+        additionalInformation:
+          maxLength: 140
+          type: string
+          description: Informações adicionais em formato livre.
+          example: Pagamento de Gabriel
+        receiverReconciliationIdentifier:
+          maxLength: 35
+          type: string
+          description: Identificador de recebíveis usado pelo recebedor para identificar o pagamento/cobrança.
+          example: '9999995555'
+        customerInitiationTimestampUTC:
+          type: string
+          description: 'Timestamp, em UTC, quando o início do pagamento foi recebido do cliente pagador. Máscara: AAAA-MM-DDTHH: MM: SS.'
+          example: '2019-11-19T14:56:16'
+        originalSystemTransactionIdentifier:
+          maxLength: 100
+          type: string
+          description: Identificador da transação no sistema de origem.
+          example: ident123
+        initiatingInstitution:
+          type: string
+          description: CNPJ da instituição que efetivamente iniciou este pagamento.
+          example: '19755844000170'
+        demandsImmediateReturn:
+          type: boolean
+          description: Indicador se o sistema do cliente aceita ou não espera que o pagamento passe pelo processo de aprovação.
+          example: true
+        historicComplement:
+          maxLength: 40
+          type: string
+          description: Complemento de histórico.
+          example: Conta de Luz
+        informationAccountHolder:
+          maxLength: 128
+          type: string
+          description: Referência do sistema de origem
+          example: bdcd0123-10a7-4d13-826d-f8474b9e7b0f
+        originSystem:
+          maxLength: 100
+          type: string
+          description: Identificador do sistema de origem.
+          example: CONVENIOS
+        instructionPriority:
+          type: string
+          description: Indica a prioridade da instrução. O valor padrão é HIGH.
+          example: HIGH
+          enum:
+            - HIGH
+            - NORM
+        instructionType:
+          type: string
+          description: 'Indica se é um pagamento prioritário (PAGPRI), um pagamento programado (PAGAGD) ou um pagamento que passou por validação antifraude (PAGFRD).'
+          enum:
+            - PAGPRI
+            - PAGFRD
+            - PAGAGD
+          default: PAGPRI
+        initiationForm:
+          type: string
+          description: 'Forma de início de pagamento. Indica se o pagamento foi iniciado: com dados manuais (MANU), por chave de endereçamento (DICT), Código QR estático (QRES) ou Código QR dinâmico (QRDN)'
+          enum:
+            - MANU
+            - DICT
+            - QRES
+            - QRDN
+        transactionPurpose:
+          type: string
+          description: 'Objetivo da transação, que pode ser: transação ou compra (IPAY). Compre com troco (GSCB) ou retire (OTHR).'
+          enum:
+            - IPAY
+            - GSCB
+            - OTHR
+          default: IPAY
+        transactionValuesDetails:
+          $ref: '#/components/schemas/TransactionValuesDetailsRequestTO'
+        settlementId:
+          type: string
+          description: Identificador do registro de débito.
+          example: '123456'
+        performCustomerDebit:
+          type: boolean
+          description: Indica se o sistema deve debitar da conta.
+        withdrawAgent:
+          $ref: '#/components/schemas/WithdrawAgentRequestTO'
+    WithdrawAgentRequestTO:
+      required:
+        - modality
+        - serviceProvider
+      type: object
+      properties:
+        modality:
+          type: string
+          description: 'Tipo do Agente/Estabelecimento que foi executado a retirada. Possíveis valores:  *AGPSS: Retirar Agente Provedor de Serviço.  *AGTEC: Agente de Estabelecimento Comercial.  *AGTOT: Agente de outro tipo de pessoa jurídica.'
+          enum:
+            - AGPSS
+            - AGTEC
+            - AGTOT
+        serviceProvider:
+          type: string
+          description: Indica um provedor de serviços de pagamento que está sendo realizada a retirada. Pode ser direto ou indireto
+      description: Detalhes da Retirada do PIX Saque/Troco
+    InstantPaymentDataV2ResponseTO:
+      required:
+        - instantPaymentId
+        - originSystem
+        - payer
+        - receiver
+      type: object
+      properties:
+        receiver:
+          $ref: '#/components/schemas/ReceiverResponseTO'
+        payer:
+          $ref: '#/components/schemas/PayerResponseTO'
+        eventStatus:
+          $ref: '#/components/schemas/EventStatusResponseTO'
+        value:
+          type: string
+          description: Valor do pagamento contendo até duas casas decimais.
+          example: '145.98'
+        receiverReconciliationIdentifier:
+          maxLength: 35
+          type: string
+          description: Identificador de recebíveis usado pelo recebedor para identificar o pagamento/cobrança.
+          example: '9999995555'
+        additionalInformation:
+          maxLength: 140
+          type: string
+          description: Informações adicionais em formato livre.
+          example: Pagamento de Gabriel
+        customerInitiationTimestampUTC:
+          type: string
+          description: 'Timestamp, em UTC, quando o início do pagamento foi recebido do cliente pagador. Máscara: AAAA-MM-DDTHH:MM:SSZ'
+          example: '2022-05-26T16:37:43.464Z'
+        originalSystemTransactionIdentifier:
+          maxLength: 100
+          type: string
+          description: Identificador da transação no sistema de origem.
+          example: ident123
+        initiatingInstitution:
+          type: string
+          description: CNPJ da instituição que efetivamente iniciou este pagamento.
+          example: '19755844000170'
+        demandsImmediateReturn:
+          type: boolean
+          description: Indica se o sistema do cliente deve ou não esperar pelo pagamento passar pelo processo de aprovação.
+          example: true
+        historicComplement:
+          maxLength: 40
+          type: string
+          description: Complemento de histórico.
+          example: Conta de Luz
+        informationAccountHolder:
+          maxLength: 128
+          type: string
+          description: Referência do sistema de origem
+          example: bdcd0123-10a7-4d13-826d-f8474b9e7b0f
+        originSystem:
+          maxLength: 100
+          type: string
+          description: Identificador do sistema de origem
+          example: CONVENIOS
+        instructionPriority:
+          type: string
+          description: Indica a prioridade da instrução. O valor padrão é HIGH.
+          example: HIGH
+          enum:
+            - HIGH
+            - NORM
+        instantPaymentId:
+          maxLength: 128
+          type: string
+          description: Identificador da transação.
+          example: bdcd0123-10a7-4d13-826d-f8474b9e7b0f
+        endToEndId:
+          type: string
+          description: Identificação única de liquidação no Banco Central
+          example: E0057376820200217082881978247566
+        instructionType:
+          type: string
+          description: 'Indica se é um pagamento prioritário (PAGPRI), um pagamento programado (PAGAGD) ou um pagamento que passou por validação antifraude (PAGFRD).'
+          example: PAGFRD
+          enum:
+            - PAGPRI
+            - PAGFRD
+            - PAGAGD
+          default: PAGPRI
+        initiationForm:
+          type: string
+          description: 'Forma de início de pagamento. Indica se o pagamento foi iniciado: com dados manuais (MANU), por chave de endereçamento (DICT), Código QR estático (QRES) ou Código QR dinâmico (QRDN)'
+          example: QRDN
+          enum:
+            - MANU
+            - DICT
+            - QRES
+            - QRDN
+        transactionPurpose:
+          type: string
+          description: 'Objetivo da transação, que pode ser: transação ou compra (IPAY). Compre com troco (GSCB) ou retire (OTHR).'
+          enum:
+            - IPAY
+            - GSCB
+            - OTHR
+          default: IPAY
+        transactionValuesDetails:
+          $ref: '#/components/schemas/TransactionValuesDetailsRequestTO'
+        settlementId:
+          type: string
+          description: Identificador do registro de débito.
+          example: '123456'
+        customerDebitMadeByMip:
+          type: boolean
+          description: Indica se o MIP debitou da conta do títular.
+          example: true
+        withdrawAgent:
+          $ref: '#/components/schemas/WithdrawAgentResponseTO'
+    InstantPaymentSettlementV2ResponseTO:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/InstantPaymentDataV2ResponseTO'
+    WithdrawAgentResponseTO:
+      required:
+        - modality
+        - serviceProvider
+      type: object
+      properties:
+        modality:
+          type: string
+          description: Tipo do Agente/Estabelecimento que foi executado a retirada
+          enum:
+            - AGPSS
+            - AGTEC
+            - AGTOT
+        serviceProvider:
+          type: string
+          description: Indica um provedor de serviços de pagamento que está sendo realizada a retirada. Pode ser direto ou indireto
+          example: '11111111'
+      description: Detalhes da Retirada do PIX Saque/Troco
+    AccountStatementsRequestTO:
+      required:
+        - agency
+        - digit
+        - number
+        - startDate
+      type: object
+      properties:
+        agency:
+          maxLength: 4
+          minLength: 1
+          type: string
+          description: Número da agência da conta.
+          example: '0001'
+        number:
+          maxLength: 20
+          minLength: 1
+          type: string
+          description: Número da conta.
+          example: '0007654321'
+        digit:
+          type: string
+          description: 'Digito da conta, é o número que fica ao final da sequência numérica. Normalmente, logo após um hífen (traço) ou espaço.'
+          example: '3'
+        startDate:
+          type: string
+          description: 'Data inicial cujos lançamentos devem ser retornados, no formato yyyy-MM-dd.'
+          example: '2022-03-08'
+        endDate:
+          type: string
+          description: 'Data final cujos lançamentos devem ser retornados, no formato yyyy-MM-dd.'
+          example: '2022-03-08'
+        accountId:
+          type: string
+          description: ID de identificação do usuario
+        dateType:
+          type: string
+          description: 'indica como o filtro dos parâmetros qtdUltimosDias e dataInicial/dataFinal devem ser aplicados. Se tiver o valor LANCAMENTO, o filtro é aplicado sobre a data de referência dos lançamentos (ou seja, a data na qual o lançamento afetou o saldo). Se tiver o valor ENTRADA, o filtro é aplicado sobre a data/hora de entrada dos lançamentos (ou seja, a data/hora na qual o lançamento foi registrado no sistema, seguindo o fuso horário da conta em questão). Notar que quando é ENTRADA e uma dataFinal é especificada, a dataFinal também é considerada, ou seja, são trazidos todos os lançamentos que foram registrados até o fim desta data.'
+          enum:
+            - ENTRADA
+            - LANCAMENTO
+            - ENTRADA_LOTE
+        searchDepositorDataByStatement:
+          type: boolean
+          description: 'Se true, irá buscar os dados do depositante de cada lançamento'
+          default: false
+      x-examples:
+        Example 1:
+          agency: '0001'
+          number: '0007654321'
+          digit: '3'
+          startDate: '2022-03-08'
+          endDate: '2022-03-08'
+          accountId: string
+          dateType: ENTRADA
+          searchDepositorDataByStatement: false
+    AccountStatementsResponseTO:
+      type: object
+      properties:
+        agency:
+          type: string
+          example: '0001'
+        accountNumber:
+          type: string
+          example: '0007654321'
+        accountDigit:
+          type: string
+        category:
+          type: string
+        statements:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatementsResponseTO'
+      x-examples:
+        Example 1:
+          agency: '0001'
+          accountNumber: '0007654321'
+          accountDigit: string
+          category: string
+          statements:
+            - historyDescriptionNoCompl: TRANSF RECEBIDA
+              historyDescription: TRANSF RECEBIDA
+              historyName: Transf recebida
+              registerDate: '2020-06-05'
+              entryDate: 'T2020-05-12T14:56:00'
+              entryLotTimeDate: '2020-05-12T14:56:00'
+              statementDate: '2020-05-12'
+              statementValue: '5.9'
+              document: '7'
+              documentTypeId: '17'
+              reference: f70ebee2-4a21-4a77-96fd-8b1bdb43af52
+              movementReference: f70ebee2-4a21-4a77-96fd-8b1bdb43af52
+              historyCode: '1002'
+              statementType: D
+              statementId: T570333
+              complement: TRANSFERÊNCIA
+              counterparty:
+                depositorDocument: '0'
+                depositorAgency: '0'
+                depositorBank: string
+                depositorIspbIf: string
+                depositorNumAccount: string
+                depositorName: string
+              blockId: '12345678'
+              transactionId: '2020-06-05'
+    CounterpartyResponseTO:
+      type: object
+      properties:
+        depositorDocument:
+          type: string
+          example: '0'
+        depositorAgency:
+          type: string
+          example: '0'
+        depositorBank:
+          type: string
+        depositorIspbIf:
+          type: string
+        depositorNumAccount:
+          type: string
+        depositorName:
+          type: string
+    StatementsResponseTO:
+      type: object
+      properties:
+        historyDescriptionNoCompl:
+          type: string
+          example: TRANSF RECEBIDA
+        historyDescription:
+          type: string
+          example: TRANSF RECEBIDA
+        historyName:
+          type: string
+          example: Transf recebida
+        registerDate:
+          type: string
+          example: '2020-06-05'
+        entryDate:
+          type: string
+          example: 'T2020-05-12T14:56:00'
+        entryLotTimeDate:
+          type: string
+          example: '2020-05-12T14:56:00'
+        statementDate:
+          type: string
+          example: '2020-05-12'
+        statementValue:
+          type: string
+          example: '5.9'
+        document:
+          type: string
+          example: '7'
+        documentTypeId:
+          type: string
+          example: '17'
+        reference:
+          type: string
+          example: f70ebee2-4a21-4a77-96fd-8b1bdb43af52
+        movementReference:
+          type: string
+          example: f70ebee2-4a21-4a77-96fd-8b1bdb43af52
+        historyCode:
+          type: string
+          example: '1002'
+        statementType:
+          type: string
+          description: 'Tipo do lançamento. [D] para considerar somente lançamentos de débito, [C] para considerar somente lançamentos de crédito ou vazio para considerar ambos. Se informado D, o resultado será negativo.'
+          example: D
+        statementId:
+          type: string
+          example: T570333
+        complement:
+          type: string
+          example: TRANSFERÊNCIA
+        counterparty:
+          $ref: '#/components/schemas/CounterpartyResponseTO'
+        blockId:
+          type: string
+          description: Id do bloqueio de saldo.
+          example: '12345678'
+        transactionId:
+          type: string
+          example: '2020-06-05'
+      x-examples:
+        Example 1:
+          historyDescriptionNoCompl: TRANSF RECEBIDA
+          historyDescription: TRANSF RECEBIDA
+          historyName: Transf recebida
+          registerDate: '2020-06-05'
+          entryDate: 'T2020-05-12T14:56:00'
+          entryLotTimeDate: '2020-05-12T14:56:00'
+          statementDate: '2020-05-12'
+          statementValue: '5.9'
+          document: '7'
+          documentTypeId: '17'
+          reference: f70ebee2-4a21-4a77-96fd-8b1bdb43af52
+          movementReference: f70ebee2-4a21-4a77-96fd-8b1bdb43af52
+          historyCode: '1002'
+          statementType: D
+          statementId: T570333
+          complement: TRANSFERÊNCIA
+          counterparty:
+            depositorDocument: '0'
+            depositorAgency: '0'
+            depositorBank: string
+            depositorIspbIf: string
+            depositorNumAccount: string
+            depositorName: string
+          blockId: '12345678'
+          transactionId: '2020-06-05'
